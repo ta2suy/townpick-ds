@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export PYTHONPATH="$HOME/project/town-pick/town-pick/processing/"
 source ../../../bin/activate
 
 echo "Start to create line station info"

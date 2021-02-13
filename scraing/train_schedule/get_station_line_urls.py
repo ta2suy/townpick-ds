@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import os
 import time
 import pickle
@@ -7,7 +10,6 @@ from utils import GetUrls
 
 
 if __name__ == '__main__':
-
     # Load line station info
     path = '../../data/line_station_info.csv'
     df_line_station_info = pd.read_csv(path)
@@ -29,9 +31,9 @@ if __name__ == '__main__':
     else:
         print(
             f'start getting station urls, total station length:{len(first_station_array)}')
-
         station_line_urls = []
         i = 0
+
         for first_station, first_station_pref in first_station_array:
             i += 1
             start = time.time()

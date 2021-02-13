@@ -1,23 +1,28 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import time
 import pickle
 import numpy as np
 import pandas as pd
 from utils import GetTrainSchedule
 
+
 if __name__ == '__main__':
     # Load line station info
-    line_station_info_path = '../../data/line_station_info.csv'
-    df_line_station_info = pd.read_csv(line_station_info_path)
+    df_line_station_info = pd.read_csv('../../data/line_station_info.csv')
 
     # Get train schedule
     print(f'total station line urls: {df_line_station_info.shape[0]}')
     train_schedule = np.empty((0, 6), int)
     unfound_train_schedule = []
+
     for i in df_line_station_info.index:
         start = time.time()
         timetable_url = df_line_station_info.loc[i, 'timetable_url']
         last_station = df_line_station_info.loc[i, 'last_station']
         gts = GetTrainSchedule(last_station)
+
         if type(timetable_url) == str:
             line_code = df_line_station_info.loc[i, 'line_code']
             line_name = df_line_station_info.loc[i, 'line_name']
@@ -45,16 +50,15 @@ if __name__ == '__main__':
 
     train_schedule_column = ['line_name', 'line_code',
                              'train_type', 'station1', 'station2', 'estimated_time']
-    df_train_schedule = pd.DataFrame(
-        train_schedule, columns=train_schedule_column)
-    df_unfound_train_schedule = pd.DataFrame(unfound_train_schedule)
 
     # Save train schedule
-    train_schedule_path = '../../data/train_schedule.csv'
-    df_train_schedule.to_csv(train_schedule_path, index=False)
+    df_train_schedule = pd.DataFrame(
+        train_schedule, columns=train_schedule_column)
+    df_train_schedule.to_csv('../../data/train_schedule.csv', index=False)
 
     # Save unfound_train_schedule
-    unfound_train_schedule_path = "../../data/unfound_train_schedule.csv"
-    df_train_schedule.to_csv(unfound_train_schedule_path, index=False)
-
+    if not unfound_train_schedule:
+        df_unfound_train_schedule = pd.DataFrame(unfound_train_schedule)
+        df_unfound_train_schedule.to_csv(
+            "../../data/unfound_train_schedule.csv", index=False)
     print('Done!')

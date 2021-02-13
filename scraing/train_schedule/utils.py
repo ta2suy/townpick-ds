@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding: utf-8
 import re
 import time
 import pickle
@@ -10,6 +12,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from preprocess import remove_bracket
 
 
 def set_driver():
@@ -24,54 +27,27 @@ def set_driver():
 
 
 class LineStationInfo:
-    def __init__(self, company_code_to_name: dict, line_code_to_name: dict, station_code_to_name: dict, pref_code_to_name: dict, ):
+    def __init__(self, company_code_to_name: dict, line_code_to_name: dict, station_code_to_name: dict, pref_code_to_name: dict):
         self.line_station_info = []
         self.company_code_to_name = company_code_to_name
         self.line_code_to_name = line_code_to_name
         self.station_code_to_name = station_code_to_name
         self.pref_code_to_name = pref_code_to_name
 
-    def covert_code_to_name(self, code, code_to_name_dict: dict):
-        if type(code) in [int, np.int64]:
-            name = code_to_name_dict[code]
-
-        else:
-            print(type(code))
-            raise TypeError("worng code type")
-
-        return name
-
-    def remove_bracket(self, text: str):
-        bracket_patterns = ['(', '（', '〈']
-
-        for bp in bracket_patterns:
-            text = text.split(bp)[0]
-
-        return text
-
     def add_station_info(self, company_cd, line_cd, line_type, first_station_cd, last_station_cd, first_station_pref_cd, last_station_pref_cd):
-
-        company_name = self.covert_code_to_name(
-            company_cd, self.company_code_to_name)
-        line_name = self.covert_code_to_name(line_cd, self.line_code_to_name)
-        first_station_name = self.covert_code_to_name(
-            first_station_cd, self.station_code_to_name)
-        last_station_name = self.covert_code_to_name(
-            last_station_cd, self.station_code_to_name)
-        first_station_pref = self.covert_code_to_name(
-            first_station_pref_cd, self.pref_code_to_name)
-        last_station_pref = self.covert_code_to_name(
-            last_station_pref_cd, self.pref_code_to_name)
+        company_name = self.company_code_to_name[company_cd]
+        line_name = self.line_code_to_name[line_cd]
+        first_station_name = self.station_code_to_name[first_station_cd]
+        last_station_name = self.station_code_to_name[last_station_cd]
+        first_station_pref = self.pref_code_to_name[first_station_pref_cd]
+        last_station_pref = self.pref_code_to_name[last_station_pref_cd]
 
         # Remove '(xxx)'
-        line_name = self.remove_bracket(line_name)
-        first_station_name = self.remove_bracket(first_station_name)
-        last_station_name = self.remove_bracket(last_station_name)
+        line_name = remove_bracket(line_name)
+        first_station_name = remove_bracket(first_station_name)
+        last_station_name = remove_bracket(last_station_name)
 
-        # # Covert 'JR東日本' and 'JR東海' to 'JR'
-        # if company_name == 'JR東日本' or company_name == 'JR東海':
-        #     company_name = 'JR'
-
+        # Add line station info
         self.line_station_info.append({
             'company_name': company_name,
             'company_code': company_cd,
@@ -87,8 +63,6 @@ class LineStationInfo:
     def save_info(self, path: str):
         df = pd.DataFrame(self.line_station_info)
         df.to_csv(path, index=False)
-        # with open(path, 'wb') as f:
-        #     pickle.dump(self.line_station_info, f)
 
 
 class GetUrls:
@@ -101,21 +75,17 @@ class GetUrls:
             EC.visibility_of_element_located((By.ID, "obj_time_st")))
         driver.find_element_by_id('obj_time_st').send_keys(station + "駅")
         driver.find_element_by_class_name('btnSearch').click()
-
         WebDriverWait(driver, 30).until(
             EC.visibility_of_element_located((By.ID, "main")))
 
         try:
             response = driver.find_element_by_id('mdSearchResult')
-
         except:
             return driver.current_url
 
         bs = BeautifulSoup(response.get_attribute(
             'innerHTML'), 'html.parser')
-
         tmp_list = []
-
         for l in bs('a'):
             tmp_list.append(l.text)
             if l.text == station or l.text == station+f'({pref})':
@@ -128,18 +98,16 @@ class GetUrls:
     def timetable(url: str, line_name: str, station: str):
         timetable_url = None
         response = requests.get(url)
+        time.sleep(1)
         bs = BeautifulSoup(response.text, 'html.parser')
         links_in_line = bs(class_='elmSearchItem direction')[0]('dl')
-
         if 'JR' in line_name:
             line_name = line_name.replace('JR', 'ＪＲ')
 
         for ll in links_in_line:
-            if line_name == ll('dt')[0].text:
-
+            if line_name in ll('dt')[0].text:
                 if len(ll('a')) == 1:
                     timetable_url = ll('a')[0].get('href')
-
                 else:
                     for l in ll('a'):
                         print(l.text)
@@ -161,6 +129,7 @@ class GetTrainSchedule:
         self.driver.get(timetable_url)
         WebDriverWait(self.driver, 30).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "elmLineDia")))
+
         try:
             response = self.driver.find_element_by_class_name('elmLineDia')
         except:
@@ -170,12 +139,11 @@ class GetTrainSchedule:
         bs = BeautifulSoup(
             response.get_attribute('innerHTML'), 'html.parser')
         destination_list = bs.select('#timeNotice2 li')
-
         train_type_dict = self.train_type_dict(bs)
         train_for = self.train_for(destination_list)
-
         df_train_schedule_url = self.train_schedule_url(
             bs, train_for, train_type_dict)
+
         if df_train_schedule_url.empty and train_for != '無印':
             print(f'Unfound train schedule in {train_for}')
             train_for = '無印'
@@ -183,7 +151,6 @@ class GetTrainSchedule:
                 bs, train_for, train_type_dict)
 
         df_train_schedule_url.drop_duplicates('train_type', inplace=True)
-
         train_schedule_list = []
         for i in df_train_schedule_url.index:
             train_schedule_url = df_train_schedule_url.loc[i, 'url']
@@ -206,17 +173,21 @@ class GetTrainSchedule:
             value = ttl.text.split('：')[1]
             if key != '無印':
                 train_type_dict[key] = value
+
         return train_type_dict
 
     def train_for(self, destination_list):
         train_for = [dl.text.split('：')[0]
                      for dl in destination_list if self.last_station in dl.text]
+
         if len(train_for) == 0:
             print(f'unfound train_for')
             return '無印'
+
         elif len(train_for) == 1:
             train_for = train_for[0]
             return train_for
+
         else:
             print(f'train_for length is more than 2, train_for:{train_for}')
             return '無印'

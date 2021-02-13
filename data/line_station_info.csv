@@ -10,14 +10,14 @@ JR東日本,2,JR横須賀線,11308,straight,東京,久里浜,東京都,神奈川
 JR東日本,2,JR相模線,11309,straight,茅ケ崎,橋本,神奈川県,神奈川県,https://transit.yahoo.co.jp/station/rail/23234/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/23234/?gid=1251&kind=1&done=time
 JR東日本,2,JR中央本線,11311,straight,東京,塩尻,東京都,長野県,https://transit.yahoo.co.jp/station/rail/22828/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22828/?gid=1091&kind=1&done=time
 JR東日本,2,JR中央線,11312,straight,東京,高尾,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22828/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22828/?gid=1091&kind=1&done=time
-JR東日本,2,JR中央・総武線,11313,straight,三鷹,千葉,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22986/?kind=1&done=time,
+JR東日本,2,JR中央・総武線,11313,straight,千葉,三鷹,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22361/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22361/?gid=1101&kind=1&done=time
 JR東日本,2,JR総武本線,11314,straight,東京,銚子,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22828/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22828/?gid=941&kind=1&done=time
 JR東日本,2,JR青梅線,11315,straight,立川,奥多摩,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22799/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22799/?gid=1111&kind=1&done=time
 JR東日本,2,JR五日市線,11316,straight,拝島,武蔵五日市,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22895/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22895/?gid=1121&kind=1&done=time
 JR東日本,2,JR八高線,11317,straight,八王子,高麗川,東京都,埼玉県,https://transit.yahoo.co.jp/station/rail/22905/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22905/?gid=1021&kind=1&done=time
 JR東日本,2,JR八高線,11318,straight,高麗川,高崎,埼玉県,群馬県,https://transit.yahoo.co.jp/station/rail/22038/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22038/?gid=1031&kind=1&done=time
 JR東日本,2,宇都宮線,11319,straight,上野,黒磯,東京都,栃木県,https://transit.yahoo.co.jp/station/rail/22528/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22528/?gid=601&kind=1&done=time
-JR東日本,2,JR常磐線,11320,straight,取手,上野,東京都,茨城県,https://transit.yahoo.co.jp/station/rail/21673/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/21673/?gid=651&kind=1&done=time
+JR東日本,2,JR常磐線,11320,straight,上野,取手,東京都,茨城県,https://transit.yahoo.co.jp/station/rail/22528/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22528/?gid=991&kind=1&done=time
 JR東日本,2,JR埼京線,11321,straight,大崎,大宮,東京都,埼玉県,https://transit.yahoo.co.jp/station/rail/22559/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22559/?gid=1061&kind=1&done=time
 JR東日本,2,JR川越線,11322,straight,大宮,高麗川,埼玉県,埼玉県,https://transit.yahoo.co.jp/station/rail/21987/?q=%E5%A4%A7%E5%AE%AE%E9%A7%85&kind=1&done=time,https://transit.yahoo.co.jp//station/time/21987/?gid=1041&q=%E5%A4%A7%E5%AE%AE%E9%A7%85&kind=1&done=time
 JR東日本,2,JR高崎線,11323,straight,上野,高崎,東京都,群馬県,https://transit.yahoo.co.jp/station/rail/22528/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22528/?gid=1011&kind=1&done=time
@@ -56,7 +56,7 @@ JR東海,3,JR御殿場線,11505,straight,国府津,沼津,神奈川県,静岡県
 京成電鉄,13,京成金町線,23003,straight,京成高砂,京成金町,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22665/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22665/?gid=2981&kind=1&done=time
 京成電鉄,13,京成千葉線,23004,straight,京成津田沼,千葉中央,千葉県,千葉県,https://transit.yahoo.co.jp/station/rail/22282/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22282/?gid=2991&kind=1&done=time
 京成電鉄,13,京成千原線,23005,straight,千葉中央,ちはら台,千葉県,千葉県,https://transit.yahoo.co.jp/station/rail/22363/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22363/?gid=3001&kind=1&done=time
-京成電鉄,13,成田スカイアクセス,23006,straight,京成上野,成田空港,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22661/?kind=1&done=time,
+京成電鉄,13,成田スカイアクセス,23006,straight,成田空港,京成上野,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22392/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22392/?gid=3010&kind=1&done=time
 京王電鉄,14,京王線,24001,straight,新宿,京王八王子,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22741/?q=%E6%96%B0%E5%AE%BF%E9%A7%85&kind=1&done=time,https://transit.yahoo.co.jp//station/time/22741/?gid=3021&q=%E6%96%B0%E5%AE%BF%E9%A7%85&kind=1&done=time
 京王電鉄,14,京王相模原線,24002,straight,調布,橋本,東京都,神奈川県,https://transit.yahoo.co.jp/station/rail/22816/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22816/?gid=3041&kind=1&done=time
 京王電鉄,14,京王高尾線,24003,straight,北野,高尾山口,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22633/?q=%E5%8C%97%E9%87%8E%E9%A7%85&kind=1&done=time,https://transit.yahoo.co.jp//station/time/22633/?gid=3071&q=%E5%8C%97%E9%87%8E%E9%A7%85&kind=1&done=time
@@ -86,7 +86,7 @@ JR東海,3,JR御殿場線,11505,straight,国府津,沼津,神奈川県,静岡県
 東京メトロ,18,東京メトロ日比谷線,28003,straight,北千住,中目黒,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22630/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22630/?gid=3301&kind=1&done=time
 東京メトロ,18,東京メトロ東西線,28004,straight,中野,西船橋,東京都,千葉県,https://transit.yahoo.co.jp/station/rail/22849/?q=%E4%B8%AD%E9%87%8E%E9%A7%85&kind=1&done=time,https://transit.yahoo.co.jp//station/time/22849/?gid=3311&q=%E4%B8%AD%E9%87%8E%E9%A7%85&kind=1&done=time
 東京メトロ,18,東京メトロ千代田線,28005,straight,北綾瀬,代々木上原,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22627/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22627/?gid=3330&kind=1&done=time
-東京メトロ,18,東京メトロ有楽町線,28006,straight,新木場,和光市,埼玉県,東京都,https://transit.yahoo.co.jp/station/rail/22733/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22733/?gid=3340&kind=1&done=time
+東京メトロ,18,東京メトロ有楽町線,28006,straight,和光市,新木場,埼玉県,東京都,https://transit.yahoo.co.jp/station/rail/22171/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22171/?gid=3341&kind=1&done=time
 東京メトロ,18,東京メトロ半蔵門線,28008,straight,渋谷,押上,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22715/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22715/?gid=3351&kind=1&done=time
 東京メトロ,18,東京メトロ南北線,28009,straight,赤羽岩淵,目黒,東京都,東京都,https://transit.yahoo.co.jp/station/rail/22488/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22488/?gid=3360&kind=1&done=time
 東京メトロ,18,東京メトロ副都心線,28010,straight,渋谷,和光市,埼玉県,東京都,https://transit.yahoo.co.jp/station/rail/22715/?kind=1&done=time,https://transit.yahoo.co.jp//station/time/22715/?gid=3370&kind=1&done=time

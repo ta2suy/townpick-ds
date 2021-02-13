@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import pandas as pd
 
 
@@ -34,7 +37,7 @@ def select_by_pref_cd(pref_cd: list, df_station: pd.DataFrame, df_line=None, df_
     return result
 
 
-def create_conversion_dict(df: pd.DataFrame, tag):
+def create_conversion_dict(df: pd.DataFrame, tag) -> dict:
     tag_list = ['station', 'line', 'company', 'pref']
     if not tag in tag_list:
         raise ValueError(f'wrong tag values, please select from {tag_list}')
@@ -47,23 +50,9 @@ def create_conversion_dict(df: pd.DataFrame, tag):
         return code_to_name
 
 
-def change_name_to_name(dict_in_list: list, pre_name: str, post_name: str, key: str):
-    key_list = ['company', 'line']
-    if not key in key_list:
-        raise ValueError(f'wrong key values, please select from {key_list}')
-    else:
-        tmp = [dl for dl in dict_in_list if dl[key] == pre_name]
-        for t in tmp:
-            t[key] = post_name
-
-        return dict_in_list
-
-
 def get_pref_cd(df_pref: pd.DataFrame, df_station: pd.DataFrame, station_cd):
-
     if type(station_cd) == list:
         return [df_station[df_station['station_cd'] == sc]['pref_cd'].values[0] for sc in station_cd]
-
     pref_cd = df_station[df_station['station_cd']
                          == station_cd]['pref_cd'].values[0]
     return pref_cd
@@ -76,3 +65,30 @@ def get_first_and_last_pref_cd(df_pref: pd.DataFrame, df_station: pd.DataFrame, 
         df_pref, df_station, last_station_cd)
 
     return first_station_pref_cd, last_station_pref_cd
+
+
+def change_duplicated_station_name(df_station: pd.DataFrame, ):
+    pref_code_to_name = create_conversion_dict(df_pref, tag='pref')
+    df_drop_duplicates = df_station.drop_duplicates(
+        ['station_name', 'pref_cd'])
+    df_duplicate = df_drop_duplicates[df_drop_duplicates.duplicated(
+        ['station_name'], keep=False)]
+
+
+def remove_bracket(text: str) -> str:
+    bracket_patterns = ['(', '（', '〈']
+    for bp in bracket_patterns:
+        text = text.split(bp)[0]
+    return text
+
+
+def full_to_harf_width_char(text: str) -> str:
+    return text.translate(str.maketrans({chr(0xFF01 + i): chr(0x21 + i) for i in range(94)}))
+
+
+def harf_to_full_width_char(text: str) -> str:
+    return text.translate(str.maketrans({chr(0x0021 + i): chr(0xFF01 + i) for i in range(94)}))
+
+
+def normalize(text: str) -> str:
+    return full_to_harf_width_char(remove_bracket(text)).replace('ケ', 'ヶ')

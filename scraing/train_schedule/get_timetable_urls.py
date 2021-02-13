@@ -1,13 +1,14 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import json
 import time
 import numpy as np
 import pandas as pd
 from utils import GetUrls
-from preprocess import change_name_to_name
 
 
 if __name__ == '__main__':
-
     # Load line station info
     line_station_info_path = '../../data/line_station_info.csv'
     df_line_station_info = pd.read_csv(line_station_info_path)
@@ -16,8 +17,7 @@ if __name__ == '__main__':
         df_line_station_info['timetable_url'] = None
 
         # Load change line name dict
-        change_line_name_path = '../../data/change_line_name.json'
-        with open(change_line_name_path, 'r') as f:
+        with open('../../data/change_line_name.json', 'r') as f:
             change_line_name_dict = json.load(f)
 
         # Get unfound urls
@@ -60,18 +60,13 @@ if __name__ == '__main__':
             tmp_timetable_url = GetUrls.timetable(
                 tmp_station_line_url, line_name, last_station)
             if tmp_timetable_url != None:
-                # print(
-                # f"Before first_station: {first_station}, last_station: {last_station}")
-                df_line_station_info.loc[i,
-                                         'last_station'] = first_station
-                df_line_station_info.loc[i,
-                                         'first_station'] = last_station
+                df_line_station_info.loc[i, 'last_station'] = first_station
+                df_line_station_info.loc[i, 'first_station'] = last_station
                 df_line_station_info.loc[i,
                                          'station_line_url'] = tmp_station_line_url
                 df_line_station_info.loc[i,
                                          'timetable_url'] = tmp_timetable_url
-                # print(
-                #     f"After first_station: {df_line_station_info.loc[i,'first_station']}, last_station: {df_line_station_info.loc[i, 'last_station']}")
+
         elapsed_time = time.time() - start
         print(
             f"{i}, {last_station}, elapsed_time:{elapsed_time}[sec]")

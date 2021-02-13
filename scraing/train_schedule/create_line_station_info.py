@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
-from utils import LineStationInfo
-from preprocess import *
+
 import pickle
 import numpy as np
 import pandas as pd
+from preprocess import *
+from utils import LineStationInfo
 
 
 if __name__ == '__main__':
-
     # Load dataset
     print('Load dataset')
     df_station = pd.read_csv('~/share/data/station/station20200619free.csv')
@@ -21,7 +21,6 @@ if __name__ == '__main__':
     pref_cd = [11, 12, 13, 14]
     df_all_dict = select_by_pref_cd(
         pref_cd, df_station, df_line, df_join, df_company)
-
     df_station = df_all_dict['station']
     df_line = df_all_dict['line']
     df_join = df_all_dict['join']
@@ -41,8 +40,8 @@ if __name__ == '__main__':
     print('Determine first & last station code to dict for each line type')
     check_station_cd_list = []
     line_station_info = {}
-    for line_cd in df_line['line_cd'].values:
 
+    for line_cd in df_line['line_cd'].values:
         company_cd = df_line[df_line['line_cd']
                              == line_cd]['company_cd'].values[0]
         df_join_tmp = df_join[df_join['line_cd'] == line_cd]
@@ -51,7 +50,6 @@ if __name__ == '__main__':
         # Do not exist station or Duplicated line (99809:伊予鉄道環状線)
         if df_station_tmp.shape[0] == 0 or line_cd == 99809:
             continue
-
         symmetric_difference_station_cd = set(
             df_join_tmp['station_cd1']) ^ set(df_join_tmp['station_cd2'])
 
@@ -123,6 +121,7 @@ if __name__ == '__main__':
     for line_cd in check_station_cd_list:
         company_cd = df_line[df_line['line_cd']
                              == line_cd]['company_cd'].values[0]
+
         if line_cd == 11304:  # JR鶴見線
             first_station_cd = 1130401
             last_station_cd_list = [1130407, 1130409, 1130413]
@@ -131,20 +130,17 @@ if __name__ == '__main__':
                 # Get first and last pref cd
                 first_station_pref_cd, last_station_pref_cd = get_first_and_last_pref_cd(
                     df_pref, df_station, first_station_cd, last_station_cd)
-
                 lsi.add_station_info(company_cd, line_cd, line_type,
                                      first_station_cd, last_station_cd, first_station_pref_cd, last_station_pref_cd)
 
         elif line_cd == 11327:  # JR成田線
-
             first_station_cd_list = [1132701, 1132720]
             last_station_cd_list = [1132705, 1132719]
-            for first_station_cd, last_station_cd in zip(first_station_cd_list, last_station_cd_list):
 
+            for first_station_cd, last_station_cd in zip(first_station_cd_list, last_station_cd_list):
                 # Get first and last pref cd
                 first_station_pref_cd, last_station_pref_cd = get_first_and_last_pref_cd(
                     df_pref, df_station, first_station_cd, last_station_cd)
-
                 lsi.add_station_info(company_cd, line_cd, line_type,
                                      first_station_cd, last_station_cd, first_station_pref_cd, last_station_pref_cd)
 
@@ -164,8 +160,5 @@ if __name__ == '__main__':
             print(f'except line is {line_cd}')
 
     # Save line station info
-    print('Save line station info')
-    save_path = '../../data/line_station_info.csv'
-    lsi.save_info(save_path)
-
+    lsi.save_info('../../data/line_station_info.csv')
     print('Done!')
