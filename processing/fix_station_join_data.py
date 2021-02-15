@@ -43,5 +43,14 @@ if __name__ == '__main__':
                        'station_cd1': takanawa_gw_cd, 'station_cd2': shinagawa_cd}
         df_join = df_join.append(append_dict, ignore_index=True)
 
+    # Delete 鹿島サッカースタジアム in JR鹿島線
+    line_cd = 11329
+    kashima_soccer_stadium_cd = df_station[(df_station['line_cd'] == line_cd) & (
+        df_station['station_name'] == '鹿島サッカースタジアム（臨）')]['station_cd'].values[0]
+    df_tmp = df_join[df_join['line_cd'] == line_cd]
+    delete_index = df_tmp[(df_tmp['station_cd1'] == kashima_soccer_stadium_cd) | (
+        df_tmp['station_cd2'] == kashima_soccer_stadium_cd)].index
+    df_join.drop(delete_index, inplace=True)
+
     df_join.to_csv(
         '~/share/data/station/join20200619_fix.csv', index=False)

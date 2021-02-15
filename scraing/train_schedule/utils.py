@@ -121,42 +121,35 @@ class GetUrls:
 
 
 class GetTrainSchedule:
-    def __init__(self, last_station):
-        self.driver = set_driver()
-        self.last_station = last_station
+    def __init__(self):
+        pass
 
-    def train_schedule(self, timetable_url: str):
-        self.driver.get(timetable_url)
-        WebDriverWait(self.driver, 30).until(
-            EC.visibility_of_element_located((By.CLASS_NAME, "elmLineDia")))
-
-        try:
-            response = self.driver.find_element_by_class_name('elmLineDia')
-        except:
-            print('unfound url')
-            return None
-
-        bs = BeautifulSoup(
-            response.get_attribute('innerHTML'), 'html.parser')
+    def train_schedule(self, timetable_url: str, line_type: str):
+        response = requests.get(timetable_url)
+        time.sleep(1)
+        bs = BeautifulSoup(response.text, 'html.parser')
         destination_list = bs.select('#timeNotice2 li')
+        destination_dict = self.destination_dict(destination_list)
         train_type_dict = self.train_type_dict(bs)
-        train_for = self.train_for(destination_list)
         df_train_schedule_url = self.train_schedule_url(
-            bs, train_for, train_type_dict)
+            bs, destination_dict, train_type_dict)
 
-        if df_train_schedule_url.empty and train_for != '無印':
-            print(f'Unfound train schedule in {train_for}')
-            train_for = '無印'
-            df_train_schedule_url = self.train_schedule_url(
-                bs, train_for, train_type_dict)
-
-        df_train_schedule_url.drop_duplicates('train_type', inplace=True)
+        # df_train_schedule_url.drop_duplicates(
+        #     ['destination', 'train_type'], inplace=True)
         train_schedule_list = []
+        duplicated_check_list = []
+        timetable_id = 1
         for i in df_train_schedule_url.index:
             train_schedule_url = df_train_schedule_url.loc[i, 'url']
+            destination = df_train_schedule_url.loc[i, 'destination']
             train_type = df_train_schedule_url.loc[i, 'train_type']
-            train_schedule_list.extend(self.train_schedule_list(
-                train_schedule_url, train_type))
+            train_schedule, duplicated_check_list = self.train_schedule_list(
+                timetable_id, train_schedule_url, destination, train_type, duplicated_check_list, line_type)
+            if train_schedule:
+                train_schedule_list.extend(train_schedule)
+                timetable_id += 1
+                if line_type == 'circle':
+                    break
 
         if not train_schedule_list:
             return None
@@ -164,6 +157,15 @@ class GetTrainSchedule:
         else:
             train_schedule_array = np.array(train_schedule_list)
             return train_schedule_array
+
+    def destination_dict(self, destination_list):
+        destination_dict = {}
+        for ttl in destination_list:
+            key = ttl.text.split('：')[0]
+            value = ttl.text.split('：')[1]
+            destination_dict[key] = value
+
+        return destination_dict
 
     def train_type_dict(self, bs):
         train_type_list = bs.select('#timeNotice1 li')
@@ -176,84 +178,65 @@ class GetTrainSchedule:
 
         return train_type_dict
 
-    def train_for(self, destination_list):
-        train_for = [dl.text.split('：')[0]
-                     for dl in destination_list if self.last_station in dl.text]
-
-        if len(train_for) == 0:
-            print(f'unfound train_for')
-            return '無印'
-
-        elif len(train_for) == 1:
-            train_for = train_for[0]
-            return train_for
-
-        else:
-            print(f'train_for length is more than 2, train_for:{train_for}')
-            return '無印'
-
-    def train_schedule_url(self, bs, train_for, train_type_dict):
+    def train_schedule_url(self, bs, destination_dict: dict, train_type_dict: dict):
         train_schedule_urls = []
-        daytime = [i for i in range(8, 17)]
+        daytime = [i for i in range(8, 16)]
         for dt in daytime:
             timetable = bs.select(f'#hh_{dt} li')
             for tt in timetable:
-                if tt.select('dd.trainFor'):
-                    if tt.select('dd.trainFor')[0].text == train_for:
-                        url = tt.find('a')['href']
-                        try:
-                            train_type = train_type_dict[tt.select('dd.trainType')[
-                                0].text[1:-1]]
-                        except:
-                            train_type = '普通'
-                        train_schedule_urls.append(
-                            [train_type, 'https://transit.yahoo.co.jp/' + url])
+                url = tt.find('a')['href']
+                try:
+                    destination = destination_dict[tt.select('dd.trainFor')[
+                        0].text]
+                except:
+                    destination = destination_dict['無印']
 
-                elif not tt.select('dd.trainFor') and train_for == '無印':
-                    url = tt.find('a')['href']
-                    try:
-                        train_type = train_type_dict[tt.select('dd.trainType')[
-                            0].text[1:-1]]
-                    except:
-                        train_type = '普通'
-                    train_schedule_urls.append(
-                        [train_type, 'https://transit.yahoo.co.jp/' + url])
-                else:
-                    continue
+                try:
+                    train_type = train_type_dict[tt.select('dd.trainType')[
+                        0].text[1:-1]]
+                except:
+                    train_type = '普通'
+
+                train_schedule_urls.append(
+                    [destination, train_type, 'https://transit.yahoo.co.jp/' + url])
 
         df_train_schedule_url = pd.DataFrame(
-            train_schedule_urls, columns=['train_type', 'url'])
+            train_schedule_urls, columns=['destination', 'train_type', 'url'])
 
         return df_train_schedule_url
 
-    def train_schedule_list(self, url: str, train_type: str):
-        train_schedule_list = []
+    def train_schedule_list(self, index: int, url: str, destination: str, train_type: str, check_list: list, line_type: str):
         response = requests.get(url)
         bs = BeautifulSoup(response.text, 'html.parser')
         train_schedule = bs.select('#mdDiaStopSta > ul > li')
-        first_station = bs.select(
-            '#main > div.mainWrp > div.labelLarge > h1')[0].text
-        found_first_station_flag = False
+        first_station = train_schedule[0]('p')[0].text
+        if line_type == 'circle':
+            last_station = first_station
+        else:
+            last_station = train_schedule[-1]('p')[0].text
 
-        for ts in train_schedule:
-            if found_first_station_flag:
+        station_length = len(train_schedule)
+        check_word = f"{first_station}_{last_station}_{station_length}"
+        if check_word in check_list:
+            return None, check_list
+
+        check_list.append(check_word)
+        train_schedule_list = []
+        for i, ts in enumerate(train_schedule):
+            if i == 0:
+                station1 = ts('p')[0].text
+                estimated_time = int(ts('p')[1].text.split('分')[0])
+                continue
+            elif ts('p')[0].text == last_station:
                 station2 = ts('p')[0].text
                 train_schedule_list.append(
-                    [train_type, station1, station2, estimated_time])
-                if station2 == self.last_station:
-                    break
-                station1 = station2
-                try:
-                    estimated_time = int(ts('p')[1].text.split('分')[0])
-                except:
-                    break
-
+                    [index, destination, train_type, station1, station2, estimated_time])
+                break
             else:
-                if ts('p')[0].text == first_station:
-                    station1 = ts('p')[0].text
-                    estimated_time = int(ts('p')[1].text.split('分')[0])
-                    found_first_station_flag = True
-                else:
-                    continue
+                station2 = ts('p')[0].text
+                train_schedule_list.append(
+                    [index, destination, train_type, station1, station2, estimated_time])
+                station1 = station2
+                estimated_time = int(ts('p')[1].text.split('分')[0])
 
-        return train_schedule_list
+        return train_schedule_list, check_list

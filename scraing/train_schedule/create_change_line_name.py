@@ -40,5 +40,6 @@ if __name__ == '__main__':
         '箱根登山ケーブルカー': '箱根登山ケーブル'
     }
 
-    with open('../../data/change_line_name.json', 'w') as f:
+    train_schedule_path = '../../data/train_schedule/'
+    with open(train_schedule_path+'change_line_name.json', 'w') as f:
         json.dump(change_line_name_dict, f, indent=4, ensure_ascii=False)

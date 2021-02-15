@@ -1,23 +1,33 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import json
 import time
+import argparse
 import numpy as np
 import pandas as pd
 from utils import GetUrls
 
 
 if __name__ == '__main__':
+    # Set argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--csvfile', default='line_station_info.csv', help='load and save csv file')
+    args = parser.parse_args()
+
     # Load line station info
-    line_station_info_path = '../../data/line_station_info.csv'
+    train_schedule_path = '../../data/train_schedule/'
+    line_station_info_path = train_schedule_path + args.csvfile
     df_line_station_info = pd.read_csv(line_station_info_path)
 
     if not 'timetable_url' in df_line_station_info.columns:
         df_line_station_info['timetable_url'] = None
 
         # Load change line name dict
-        with open('../../data/change_line_name.json', 'r') as f:
+        change_line_name_path = train_schedule_path + 'change_line_name.json'
+        with open(change_line_name_path, 'r') as f:
             change_line_name_dict = json.load(f)
 
         # Get unfound urls
@@ -34,8 +44,10 @@ if __name__ == '__main__':
             print(i + 1, line_name, last_station)
 
             # Change line name in unfound urls data
-            if line_name in change_line_name_dict.keys():
-                line_name = change_line_name_dict[line_name]
+            if args.csvfile == 'unfound_line_station_info.csv':
+                if not line_name in ["JR中央本線", "JR総武本線"]:
+                    if line_name in change_line_name_dict.keys():
+                        line_name = change_line_name_dict[line_name]
 
             df_line_station_info.loc[i, 'timetable_url'] = GetUrls.timetable(
                 url, line_name, last_station)

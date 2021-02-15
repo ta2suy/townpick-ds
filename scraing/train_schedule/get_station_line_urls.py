@@ -4,15 +4,25 @@
 import os
 import time
 import pickle
+import argparse
 import numpy as np
 import pandas as pd
 from utils import GetUrls
 
 
 if __name__ == '__main__':
+    # Set argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--csvfile', default='line_station_info.csv', help='load and save csv file')
+    parser.add_argument(
+        '--picklefile', default='station_line_urls.pickle', help='load and save pickle file')
+    args = parser.parse_args()
+
     # Load line station info
-    path = '../../data/line_station_info.csv'
-    df_line_station_info = pd.read_csv(path)
+    train_schedule_path = '../../data/train_schedule/'
+    line_station_info_path = train_schedule_path + args.csvfile
+    df_line_station_info = pd.read_csv(line_station_info_path)
 
     if not 'station_line_url' in df_line_station_info.columns:
         df_line_station_info['station_line_url'] = None
@@ -22,7 +32,7 @@ if __name__ == '__main__':
         'first_station', 'first_station_pref']].drop_duplicates().values
 
     # Check if station line urls file exists
-    station_line_urls_path = '../../data/station_line_urls.pickle'
+    station_line_urls_path = train_schedule_path + args.picklefile
     if os.path.exists(station_line_urls_path):
         with open(station_line_urls_path, 'rb') as f:
             station_line_urls = pickle.load(f)
@@ -73,5 +83,5 @@ if __name__ == '__main__':
             df_line_station_info['line_name'] == usu['line']), 'station_line_url'] = 'https://transit.yahoo.co.jp' + usu['url']
 
     # Save station urls
-    df_line_station_info.to_csv(path, index=False)
+    df_line_station_info.to_csv(line_station_info_path, index=False)
     print('Done!')

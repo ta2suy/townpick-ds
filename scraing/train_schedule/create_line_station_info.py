@@ -11,11 +11,12 @@ from utils import LineStationInfo
 if __name__ == '__main__':
     # Load dataset
     print('Load dataset')
-    df_station = pd.read_csv('~/share/data/station/station20200619free.csv')
-    df_line = pd.read_csv('~/share/data/station/line20200619free.csv')
-    df_join = pd.read_csv('~/share/data/station/join20200619_fix.csv')
-    df_company = pd.read_csv('~/share/data/station/company20200619.csv')
-    df_pref = pd.read_csv('~/share/data/station/pref.csv')
+    raw_station_data_path = '/home/vagrant/share/data/station/'
+    df_station = pd.read_csv(raw_station_data_path + 'station20200619free.csv')
+    df_line = pd.read_csv(raw_station_data_path + 'line20200619free.csv')
+    df_join = pd.read_csv(raw_station_data_path + 'join20200619_fix.csv')
+    df_company = pd.read_csv(raw_station_data_path + 'company20200619.csv')
+    df_pref = pd.read_csv(raw_station_data_path + 'pref.csv')
 
     # Select saitama, chiba, tokyo and kanagawa data
     pref_cd = [11, 12, 13, 14]
@@ -55,13 +56,13 @@ if __name__ == '__main__':
 
         # Circle type
         if len(symmetric_difference_station_cd) == 0:
-            line_type = 'cricle'
+            line_type = 'circle'
             first_station_cd = df_station_tmp['station_cd'].values[0]
             last_station_cd = df_station_tmp['station_cd'].values[-1]
 
         # Line circle type
         elif len(symmetric_difference_station_cd) == 1:
-            line_type = 'line_cricle'
+            line_type = 'line_circle'
             first_station_cd = list(symmetric_difference_station_cd)[0]
             if df_join_tmp[df_join_tmp['station_cd1'].duplicated()].shape[0] != 0:
                 last_station_cd = df_join_tmp[df_join_tmp['station_cd1'].duplicated(
@@ -160,5 +161,6 @@ if __name__ == '__main__':
             print(f'except line is {line_cd}')
 
     # Save line station info
-    lsi.save_info('../../data/line_station_info.csv')
+    train_schedule_path = '../../data/train_schedule/'
+    lsi.save_info(train_schedule_path+'line_station_info.csv')
     print('Done!')
