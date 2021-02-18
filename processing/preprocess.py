@@ -111,3 +111,57 @@ def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame) -> set:
     station1 = set(df_train_schedule['station1'].values)
     station2 = set(df_train_schedule['station2'].values)
     return station1 | station2
+
+
+def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list) -> list:
+    df_line_tmp = df_train_schedule[df_train_schedule['line_code'] == line_code]
+    station1_timetable_id = set(
+        df_line_tmp[df_line_tmp['station1_g_cd'] == station_code]['timetable_id'].values)
+    station2_timetable_id = set(
+        df_line_tmp[df_line_tmp['station2_g_cd'] == station_code]['timetable_id'].values)
+    timetable_id_list = list(station1_timetable_id | station2_timetable_id)
+    for ti in timetable_id_list:
+        df_timetable_tmp = df_line_tmp[df_line_tmp['timetable_id'] == ti].reset_index(
+            drop=True)
+
+        index = df_timetable_tmp[df_timetable_tmp['station1_g_cd']
+                                 == station_code].index
+        if len(index) != 0:
+            tmp_time = accum_time
+            for i in range(index[0], df_timetable_tmp.shape[0]):
+                tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                if tmp_time > max_time:
+                    break
+                extracted_station_list.append({
+                    'station_g_cd': df_timetable_tmp.loc[i, 'station2_g_cd'],
+                    'time_required': tmp_time,
+                    'number_of_transfers': num_transfer,
+                    'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                    'transfer_station': station_code,
+                })
+
+        index = df_timetable_tmp[df_timetable_tmp['station2_g_cd']
+                                 == station_code].index
+        if len(index) != 0:
+            tmp_time = accum_time
+            for i in reversed(range(0, index[0]+1)):
+                tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                if tmp_time > max_time:
+                    break
+                extracted_station_list.append({
+                    'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
+                    'time_required': tmp_time,
+                    'number_of_transfers': 0,
+                    'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                    'transfer_station': station_code,
+                })
+
+        return extracted_station_list
+
+
+def list_to_df(list: list, sort_col, drop_col):
+    df = pd.DataFrame(list)
+    df.sort_values(sort_col, inplace=True)
+    df.drop_duplicates(drop_col, inplace=True)
+    df = df.reset_index(drop=True)
+    return df

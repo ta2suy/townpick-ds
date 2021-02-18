@@ -58,7 +58,7 @@ if __name__ == '__main__':
             print(f"{i+1}, {line_name}, elapsed_time:{elapsed_time}[sec]")
 
     # Save train schedule
-    train_schedule_path = '../../data/train_schedule/'
+    train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     df_train_schedule = pd.DataFrame(
         train_schedule, columns=train_schedule_column)
     df_train_schedule.to_csv(train_schedule_path +

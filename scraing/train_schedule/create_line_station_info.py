@@ -161,6 +161,6 @@ if __name__ == '__main__':
             print(f'except line is {line_cd}')
 
     # Save line station info
-    train_schedule_path = '../../data/train_schedule/'
+    train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     lsi.save_info(train_schedule_path+'line_station_info.csv')
     print('Done!')

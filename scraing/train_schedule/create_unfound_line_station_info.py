@@ -7,7 +7,7 @@ from preprocess import *
 if __name__ == '__main__':
     # Load data
     raw_station_data_path = '/home/vagrant/share/data/station/'
-    train_schedule_path = '../../data/train_schedule/'
+    train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     df_station = pd.read_csv(raw_station_data_path + 'station20200619free.csv')
     df_line = pd.read_csv(raw_station_data_path + 'line20200619free.csv')
     df_join = pd.read_csv(raw_station_data_path + 'join20200619_fix.csv')

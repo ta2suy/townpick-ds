@@ -20,7 +20,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Load line station info
-    train_schedule_path = '../../data/train_schedule/'
+    train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     line_station_info_path = train_schedule_path + args.csvfile
     df_line_station_info = pd.read_csv(line_station_info_path)
 

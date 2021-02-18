@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import json
+import pickle
 import time
 import numpy as np
 import pandas as pd
@@ -158,3 +159,7 @@ if __name__ == '__main__':
     station_g_code_dict_path = '../data/station_g_cd_dict.json'
     with open(station_g_code_dict_path, 'w') as f:
         json.dump(station_g_code_dict, f, indent=4, ensure_ascii=False)
+
+    station_g_code_dict_path = '../data/station_g_cd_dict.pickle'
+    with open(station_g_code_dict_path, 'wb') as f:
+        pickle.dump(station_g_code_dict, f)
