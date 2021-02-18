@@ -37,17 +37,30 @@ def select_by_pref_cd(pref_cd: list, df_station: pd.DataFrame, df_line=None, df_
     return result
 
 
-def create_conversion_dict(df: pd.DataFrame, tag) -> dict:
+def create_conversion_dict(df: pd.DataFrame, tag: str, dict_type='code_to_name') -> dict:
     tag_list = ['station', 'line', 'company', 'pref']
+    dict_type_list = ['code_to_name', 'name_to_code']
     if not tag in tag_list:
         raise ValueError(f'wrong tag values, please select from {tag_list}')
 
-    else:
+    if not dict_type in dict_type_list:
+        raise ValueError(
+            f'wrong dict_type values, please select from {dict_type_list}')
+
+    if dict_type == 'code_to_name':
         code_to_name = {}
         for i in df.index:
             code_to_name[df[f'{tag}_cd'][i]] = df[f'{tag}_name'][i]
 
         return code_to_name
+
+    elif dict_type == 'name_to_code':
+        name_to_code = {}
+        tag_set = list(set(df[f'{tag}_name']))
+        for t in tag_set:
+            name_to_code[t] = df[df[f'{tag}_name'] == t][f'{tag}_cd'].values
+
+        return name_to_code
 
 
 def get_pref_cd(df_pref: pd.DataFrame, df_station: pd.DataFrame, station_cd):
@@ -92,3 +105,9 @@ def harf_to_full_width_char(text: str) -> str:
 
 def normalize(text: str) -> str:
     return full_to_harf_width_char(remove_bracket(text)).replace('ケ', 'ヶ')
+
+
+def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame) -> set:
+    station1 = set(df_train_schedule['station1'].values)
+    station2 = set(df_train_schedule['station2'].values)
+    return station1 | station2
