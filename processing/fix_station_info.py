@@ -8,8 +8,9 @@ from preprocess import create_conversion_dict, normalize
 
 if __name__ == '__main__':
     # Load dataset
-    df_station = pd.read_csv('~/share/data/station/station20200619free.csv')
-    df_pref = pd.read_csv('~/share/data/station/pref.csv')
+    df_station = pd.read_csv(
+        '/home/vagrant/share/data/station/station20200619free.csv')
+    df_pref = pd.read_csv('/home/vagrant/share/data/station/pref.csv')
 
     # Add みなみ寄居 station
     minami_yorii_info = {
@@ -79,6 +80,6 @@ if __name__ == '__main__':
                        d['station_g_cd'], 'station_name'] = d['station_name']
 
     # Save new station dataframe
-    save_path = "~/share/data/station/station20200619_fix.csv"
+    save_path = "/home/vagrant/share/data/station/station20200619_fix.csv"
     df_station.to_csv(save_path, index=False)
     print("Done!")

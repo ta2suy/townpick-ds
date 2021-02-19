@@ -5,7 +5,7 @@ import pandas as pd
 
 if __name__ == '__main__':
     # Load data
-    df_join = pd.read_csv('~/share/data/station/join20200619.csv')
+    df_join = pd.read_csv('/home/vagrant/share/data/station/join20200619.csv')
     df_station = pd.read_csv(
         '/home/vagrant/share/data/station/station20200619free.csv')
 
@@ -53,4 +53,4 @@ if __name__ == '__main__':
     df_join.drop(delete_index, inplace=True)
 
     df_join.to_csv(
-        '~/share/data/station/join20200619_fix.csv', index=False)
+        '/home/vagrant/share/data/station/join20200619_fix.csv', index=False)
