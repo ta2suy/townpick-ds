@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from preprocess import *
-from utils import LineStationInfo
+from train_schedule import LineStationInfo
 
 
 if __name__ == '__main__':

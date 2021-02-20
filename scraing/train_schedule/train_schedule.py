@@ -1,29 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
-import re
+
+import os
+import sys
 import time
 import pickle
-import requests
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from preprocess import remove_bracket
-
-
-def set_driver():
-    # Set driver
-    opt = Options()
-    opt.add_argument('--headless')
-
-    # Open browser
-    driver = webdriver.Chrome(options=opt)
-
-    return driver
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scraping_utils import *  # nopep8
+from preprocess import remove_bracket  # nopep8
 
 
 class LineStationInfo:
@@ -83,13 +73,13 @@ class GetUrls:
         except:
             return driver.current_url
 
-        bs = BeautifulSoup(response.get_attribute(
+        soup = BeautifulSoup(response.get_attribute(
             'innerHTML'), 'html.parser')
         tmp_list = []
-        for l in bs('a'):
+        for l in soup('a'):
             tmp_list.append(l.text)
             if l.text == station or l.text == station+f'({pref})':
-                return 'https://transit.yahoo.co.jp' + bs('a')[0].get('href')
+                return 'https://transit.yahoo.co.jp' + soup('a')[0].get('href')
 
         print(f'{station} dose not exist in {tmp_list}')
         return None
@@ -97,10 +87,8 @@ class GetUrls:
     @staticmethod
     def timetable(url: str, line_name: str, station: str):
         timetable_url = None
-        response = requests.get(url)
-        time.sleep(1)
-        bs = BeautifulSoup(response.text, 'html.parser')
-        links_in_line = bs(class_='elmSearchItem direction')[0]('dl')
+        soup = get_soup(url)
+        links_in_line = soup(class_='elmSearchItem direction')[0]('dl')
         if 'JR' in line_name:
             line_name = line_name.replace('JR', 'ＪＲ')
 
@@ -125,14 +113,12 @@ class GetTrainSchedule:
         pass
 
     def train_schedule(self, timetable_url: str, line_type: str):
-        response = requests.get(timetable_url)
-        time.sleep(1)
-        bs = BeautifulSoup(response.text, 'html.parser')
-        destination_list = bs.select('#timeNotice2 li')
+        soup = get_soup(timetable_url)
+        destination_list = soup.select('#timeNotice2 li')
         destination_dict = self.destination_dict(destination_list)
-        train_type_dict = self.train_type_dict(bs)
+        train_type_dict = self.train_type_dict(soup)
         df_train_schedule_url = self.train_schedule_url(
-            bs, destination_dict, train_type_dict)
+            soup, destination_dict, train_type_dict)
 
         # df_train_schedule_url.drop_duplicates(
         #     ['destination', 'train_type'], inplace=True)
@@ -167,8 +153,8 @@ class GetTrainSchedule:
 
         return destination_dict
 
-    def train_type_dict(self, bs):
-        train_type_list = bs.select('#timeNotice1 li')
+    def train_type_dict(self, soup):
+        train_type_list = soup.select('#timeNotice1 li')
         train_type_dict = {}
         for ttl in train_type_list:
             key = ttl.text.split('：')[0]
@@ -178,11 +164,11 @@ class GetTrainSchedule:
 
         return train_type_dict
 
-    def train_schedule_url(self, bs, destination_dict: dict, train_type_dict: dict):
+    def train_schedule_url(self, soup, destination_dict: dict, train_type_dict: dict):
         train_schedule_urls = []
         daytime = [i for i in range(8, 16)]
         for dt in daytime:
-            timetable = bs.select(f'#hh_{dt} li')
+            timetable = soup.select(f'#hh_{dt} li')
             for tt in timetable:
                 url = tt.find('a')['href']
                 try:
@@ -206,9 +192,8 @@ class GetTrainSchedule:
         return df_train_schedule_url
 
     def train_schedule_list(self, index: int, url: str, destination: str, train_type: str, check_list: list, line_type: str):
-        response = requests.get(url)
-        bs = BeautifulSoup(response.text, 'html.parser')
-        train_schedule = bs.select('#mdDiaStopSta > ul > li')
+        soup = get_soup(url)
+        train_schedule = soup.select('#mdDiaStopSta > ul > li')
         first_station = train_schedule[0]('p')[0].text
         if line_type == 'circle':
             last_station = first_station

@@ -4,7 +4,7 @@
 import time
 import numpy as np
 import pandas as pd
-from utils import GetTrainSchedule
+from train_schedule import GetTrainSchedule
 
 if __name__ == '__main__':
     unfound_train_schedule_urls = [

@@ -7,7 +7,7 @@ import pickle
 import argparse
 import numpy as np
 import pandas as pd
-from utils import GetUrls
+from train_schedule import GetUrls
 
 
 if __name__ == '__main__':

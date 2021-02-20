@@ -7,7 +7,7 @@ import pickle
 import argparse
 import numpy as np
 import pandas as pd
-from utils import GetTrainSchedule
+from train_schedule import GetTrainSchedule
 
 
 if __name__ == '__main__':

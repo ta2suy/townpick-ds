@@ -1,4 +1,5 @@
-!/bin/bash
+#!/usr/bin/zsh
+export PYTHONPATH="$HOME/project/town-pick/town-pick/scraping/"
 export PYTHONPATH="$HOME/project/town-pick/town-pick/processing/"
 source ../../../bin/activate
 
