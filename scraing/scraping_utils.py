@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-def get_soup(url: str, sleep_sec=1):
+def get_soup(url: str, sleep_sec=3):
     response = requests.get(url)
     time.sleep(sleep_sec)
     return BeautifulSoup(response.text, 'html.parser')
