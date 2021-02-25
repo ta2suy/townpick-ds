@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from preprocess import *
-import pandas as pd
-import argparse
-import pickle
+import os
+import sys
 import time
 import copy
+import pickle
+import argparse
+import pandas as pd
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from preprocess import *  # nopep8
 
 
 def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list) -> list:
@@ -47,7 +50,7 @@ def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int
                 extracted_station_list.append({
                     'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
                     'time_required': tmp_time,
-                    'number_of_transfers': 0,
+                    'number_of_transfers': num_transfer,
                     'line_used': df_timetable_tmp.loc[i, 'line_name'],
                     'transfer_station': station_code,
                 })
@@ -69,7 +72,7 @@ if __name__ == '__main__':
     df_train_schedule = pd.read_csv(
         train_schedule_path + 'train_schedule_fix.csv')
 
-    with open('../data/station_g_cd_dict.pickle', 'rb') as f:
+    with open('../../data/station_g_cd_dict.pickle', 'rb') as f:
         station_g_code_dict = pickle.load(f)
 
     # Remove limited express line
@@ -97,13 +100,13 @@ if __name__ == '__main__':
         df_tmp = list_to_df(extracted_stations_list, sort_col=[
                             'time_required', 'number_of_transfers'], drop_col='station_g_cd')
         loop_flag = True
-        num_transfer += 1
 
         # Extract stations with one or more transfers
         while(loop_flag):
             if num_transfer > args.max_transfer:
                 break
 
+            num_transfer += 1
             tmp_list = []
             for i in df_tmp.index:
                 tmp_sgc = df_tmp.loc[i, 'station_g_cd']
@@ -122,7 +125,6 @@ if __name__ == '__main__':
                 df_tmp = list_to_df(tmp_list, sort_col=[
                                     'time_required', 'number_of_transfers'], drop_col='station_g_cd')
                 extracted_stations_list.extend(tmp_list)
-                num_transfer += 1
 
         df_tmp = list_to_df(extracted_stations_list, sort_col=[
                             'time_required', 'number_of_transfers'], drop_col='station_g_cd')
@@ -133,6 +135,6 @@ if __name__ == '__main__':
             f"{count_num}, {sgc, scd['station']}, elapsed_time:{elapsed_time}[sec]")
 
     # Save extracted stations
-    with open('../data/extracted_stations_dict.pickle', 'wb') as f:
+    with open('../../data/extracted_stations_dict.pickle', 'wb') as f:
         pickle.dump(extracted_stations_dict, f)
     print("Done!")
