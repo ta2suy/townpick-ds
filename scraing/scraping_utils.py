@@ -9,8 +9,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-print(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__))))
 sys.path.append(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__)))+"/processing")
 from preprocess import create_conversion_dict  # nopep8
