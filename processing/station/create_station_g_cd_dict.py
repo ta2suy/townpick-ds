@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import sys
 import pickle
 import numpy as np
 import pandas as pd
-from preprocess import *
+sys.path.append(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))
+from preprocess import *  # nopep8
 
 
 if __name__ == '__main__':
