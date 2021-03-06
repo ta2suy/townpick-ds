@@ -15,6 +15,7 @@ if __name__ == '__main__':
     df_supermarket = scraping_from_navitime(category_id, pref_code_list)
 
     # Save supermarket info
-    save_path = "/home/vagrant/share/data/shopping/supermarket.csv"
-    df_supermarket.to_csv(save_path, index=False)
+    directory_path = "/home/vagrant/share/data/shopping/"
+    os.makedirs(directory_path, exist_ok=True)
+    df_supermarket.to_csv(directory_path + "supermarket.csv", index=False)
     print("Done!")
