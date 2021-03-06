@@ -29,14 +29,17 @@ def set_driver():
     return driver
 
 
-def scraping_from_navitime(category_id: str, pref_code_list: list) -> pd.DataFrame:
+def get_pref_code_to_name():
     # Load pref data
     pref_path = "/home/vagrant/share/data/station/pref.csv"
     df_pref = pd.read_csv(pref_path)
-    pref_code_to_name = create_conversion_dict(df_pref, 'pref')
+    return create_conversion_dict(df_pref, 'pref')
+
+
+def scraping_from_navitime(category_id: str, pref_code_list: list) -> pd.DataFrame:
+    pref_code_to_name = get_pref_code_to_name()
 
     # Get info
-    pref_code_list = [i for i in range(11, 15)]
     main_url = "https://www.navitime.co.jp/category/{0}/{1}/?page={2}"
     info_list = []
     for pref_code in pref_code_list:
@@ -57,6 +60,36 @@ def scraping_from_navitime(category_id: str, pref_code_list: list) -> pd.DataFra
                 info_dict['pref'] = pref
                 info_list.append(info_dict)
             page_id += 1
+        print("")
+
+    return pd.DataFrame(info_list)
+
+
+def scraping_from_mapfan(category_id: str, pref_code_list: list) -> pd.DataFrame:
+    pref_code_to_name = get_pref_code_to_name()
+
+    # Get info
+    main_url = "https://mapfan.com/genres/{0}/{1}/"
+    info_list = []
+    for pref_code in pref_code_list:
+        pref = pref_code_to_name[pref_code]
+        soup = get_soup(main_url.format(category_id, pref_code))
+        mun_urls = soup(class_="list ng-star-inserted")[0]('a')
+        for mu in mun_urls:
+            mun = mu.text.split(" ")[0]
+            url = "https://mapfan.com" + mu.get('href')
+            print(f"pref: {pref}, mun:{mun}")
+            soup = get_soup(url)
+            store_list = soup(
+                class_="mat-list-item mat-focus-indicator mat-3-line mat-list-item-avatar mat-list-item-with-avatar ng-star-inserted")
+            for store in store_list:
+                info_dict = {}
+                info_dict['name'] = store(
+                    class_="mat-line name mat-subheading-1")[0].text
+                info_dict['address'] = store(class_="mat-line address")[0].text
+                info_dict['pref'] = pref
+                info_dict['mun'] = mun
+                info_list.append(info_dict)
         print("")
 
     return pd.DataFrame(info_list)
