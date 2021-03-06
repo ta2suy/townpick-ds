@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import time
+import requests
+import xmltodict
 import pandas as pd
 
 
@@ -124,3 +127,22 @@ def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame, tag='name
         station2 = set(df_train_schedule['station2_g_cd'].values)
 
     return station1 | station2
+
+
+def get_latlng(address: str):
+    url = 'http://www.geocoding.jp/api/'
+    payload = {'q': address}
+    result = requests.get(url, params=payload)
+    time.sleep(10)
+    resultdict = xmltodict.parse(result.text)
+    try:
+        if resultdict['html']['head']['title'] == "Too Many Requests":
+            return "stop"
+    except:
+        try:
+            lat = resultdict["result"]["coordinate"]["lat"]
+            lng = resultdict["result"]["coordinate"]["lng"]
+            return lat, lng
+        except:
+            print(f"Not found latlng in '{address}'")
+            return None, None
