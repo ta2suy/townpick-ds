@@ -79,17 +79,26 @@ def scraping_from_mapfan(category_id: str, pref_code_list: list) -> pd.DataFrame
             mun = mu.text.split(" ")[0]
             url = "https://mapfan.com" + mu.get('href')
             print(f"pref: {pref}, mun:{mun}")
-            soup = get_soup(url)
-            store_list = soup(
-                class_="mat-list-item mat-focus-indicator mat-3-line mat-list-item-avatar mat-list-item-with-avatar ng-star-inserted")
-            for store in store_list:
-                info_dict = {}
-                info_dict['name'] = store(
-                    class_="mat-line name mat-subheading-1")[0].text
-                info_dict['address'] = store(class_="mat-line address")[0].text
-                info_dict['pref'] = pref
-                info_dict['mun'] = mun
-                info_list.append(info_dict)
+            page_id = 1
+            while True:
+                soup = get_soup(url + "?page={}".format(page_id))
+                facility_list = soup(
+                    class_="mat-list-item mat-focus-indicator mat-3-line mat-list-item-avatar mat-list-item-with-avatar ng-star-inserted")
+                if len(facility_list) == 0:
+                    break
+                else:
+                    page_id += 1
+                for facility in facility_list:
+                    info_dict = {}
+                    info_dict['name'] = facility(
+                        class_="mat-line name mat-subheading-1")[0].text
+                    info_dict['address'] = facility(
+                        class_="mat-line address")[0].text
+                    info_dict['category'] = facility(class_='mat-line genre-name ng-star-inserted')[
+                        0].text.replace(" ", "").replace("[", "").replace("]", "")
+                    info_dict['pref'] = pref
+                    info_dict['mun'] = mun
+                    info_list.append(info_dict)
         print("")
 
     return pd.DataFrame(info_list)
