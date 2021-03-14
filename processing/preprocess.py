@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import time
-import requests
 import xmltodict
 import pandas as pd
 
@@ -92,9 +91,15 @@ def change_duplicated_station_name(df_station: pd.DataFrame, ):
 
 
 def remove_bracket(text: str) -> str:
-    bracket_patterns = ['(', '（', '〈']
-    for bp in bracket_patterns:
-        text = text.split(bp)[0]
+    bracket_patterns_front = ['(', '（', '〈']
+    bracket_patterns_end = [')', '）', '〉']
+    for bpf, bpe in zip(bracket_patterns_front, bracket_patterns_end):
+        if text[0] == bpf:
+            text = text.split(bpe)[1]
+        elif text[-1] == bpe:
+            text = text.split(bpf)[0]
+        else:
+            pass
     return text
 
 
@@ -146,3 +151,23 @@ def get_latlng(address: str):
         except:
             print(f"Not found latlng in '{address}'")
             return None, None
+
+
+def get_columns_from_census(df, category_row, columns_row):
+    columns = []
+    columns_num = []
+    for c in df.loc[category_row][df.loc[category_row].notnull()].index:
+        columns_num.append(df.columns.get_loc(c))
+
+    for i in range(len(columns_num)):
+        if i == 0:
+            columns.extend(df.iloc[columns_row, :columns_num[i]].values)
+        else:
+            tmp = df.iloc[columns_row, columns_num[i-1]:columns_num[i]].values
+            cotegory = remove_bracket(df.iloc[category_row, columns_num[i-1]])
+            columns.extend([cotegory+"_"+t for t in tmp])
+        if i == len(columns_num)-1:
+            tmp = df.iloc[columns_row, columns_num[i]:].values
+            cotegory = remove_bracket(df.iloc[category_row, columns_num[i]])
+            columns.extend([cotegory+"_"+t for t in tmp])
+    return columns

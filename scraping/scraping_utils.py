@@ -17,7 +17,7 @@ from preprocess import create_conversion_dict  # nopep8
 def get_soup(url: str, sleep_sec=3):
     response = requests.get(url)
     time.sleep(sleep_sec)
-    return BeautifulSoup(response.text, 'html.parser')
+    return BeautifulSoup(response.content, 'html.parser')
 
 
 def set_driver():

@@ -18,12 +18,12 @@ if __name__ == '__main__':
     # Get nursery kindergarten info from mapfan
     category_id = "1705"
     pref_code_list = [i for i in range(11, 15)]
-    df_nursery_kindergarten = scraping_from_mapfan(
+    df_nursery = scraping_from_mapfan(
         category_id, pref_code_list)
 
-    # Save nursery kindergarten store info
+    # Save nursery info
     directory_path = "/home/vagrant/share/data/education/"
     os.makedirs(directory_path, exist_ok=True)
-    df_nursery_kindergarten.to_csv(
-        directory_path + "nursery_kindergarten.csv", index=False)
+    df_nursery.to_csv(
+        directory_path + "nursery.csv", index=False)
     print("Done!")
