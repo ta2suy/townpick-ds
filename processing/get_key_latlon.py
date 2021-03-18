@@ -6,6 +6,7 @@ import sys
 import time
 import json
 import pickle
+import pandas as pd
 sys.path.append(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__)))+"/scraping/")
 from scraping_utils import get_soup  # nopep8
@@ -48,7 +49,9 @@ if __name__ == '__main__':
     key_latlon = get_key_latlon(urls)
 
     # Save
-    path = "/home/vagrant/share/data/census/key_latlon.pickle"
-    with open(path, "wb") as f:
-        pickle.dump(key_latlon, f)
+    path = "/home/vagrant/share/data/census/key_latlon.csv"
+    df = pd.DataFrame(key_latlon, columns=['key_code', 'lat', 'lon'])
+    df = df.groupby('key_code').mean()
+    df.reset_index(inplace=True)
+    df.to_csv(path, index=False)
     print("Done!")

@@ -134,7 +134,7 @@ def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame, tag='name
     return station1 | station2
 
 
-def get_latlng(address: str):
+def get_latlon(address: str):
     url = 'http://www.geocoding.jp/api/'
     payload = {'q': address}
     result = requests.get(url, params=payload)
@@ -146,28 +146,8 @@ def get_latlng(address: str):
     except:
         try:
             lat = resultdict["result"]["coordinate"]["lat"]
-            lng = resultdict["result"]["coordinate"]["lng"]
-            return lat, lng
+            lon = resultdict["result"]["coordinate"]["lon"]
+            return lat, lon
         except:
-            print(f"Not found latlng in '{address}'")
+            print(f"Not found latlon in '{address}'")
             return None, None
-
-
-def get_columns_from_census(df, category_row, columns_row):
-    columns = []
-    columns_num = []
-    for c in df.loc[category_row][df.loc[category_row].notnull()].index:
-        columns_num.append(df.columns.get_loc(c))
-
-    for i in range(len(columns_num)):
-        if i == 0:
-            columns.extend(df.iloc[columns_row, :columns_num[i]].values)
-        else:
-            tmp = df.iloc[columns_row, columns_num[i-1]:columns_num[i]].values
-            cotegory = remove_bracket(df.iloc[category_row, columns_num[i-1]])
-            columns.extend([cotegory+"_"+t for t in tmp])
-        if i == len(columns_num)-1:
-            tmp = df.iloc[columns_row, columns_num[i]:].values
-            cotegory = remove_bracket(df.iloc[category_row, columns_num[i]])
-            columns.extend([cotegory+"_"+t for t in tmp])
-    return columns
