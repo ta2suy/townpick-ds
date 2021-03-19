@@ -7,8 +7,7 @@ import time
 import json
 import pickle
 import pandas as pd
-sys.path.append(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__)))+"/scraping/")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scraping_utils import get_soup  # nopep8
 
 
@@ -41,7 +40,12 @@ def get_key_latlon(urls):
 
 if __name__ == '__main__':
     # Get urls
-    pref_list = ["埼玉県", "千葉県", "東京都", "神奈川県"]
+    pref_path = '/home/vagrant/share/data/pref.csv'
+    df_pref = pd.read_csv(pref_path)
+    df_pref.set_index('id', inplace=True)
+    use_id = [8, 9, 10, 19, 20, 22]
+    df_pref = df_pref.loc[use_id]
+    pref_list = df_pref['kanji'].values
     urls = get_urls(pref_list)
 
     # Get key latlon
@@ -53,5 +57,8 @@ if __name__ == '__main__':
     df = pd.DataFrame(key_latlon, columns=['key_code', 'lat', 'lon'])
     df = df.groupby('key_code').mean()
     df.reset_index(inplace=True)
+    if os.path.exists(path):
+        df_tmp = pd.read_csv(path)
+        df = pd.concat([df, df_tmp])
     df.to_csv(path, index=False)
     print("Done!")

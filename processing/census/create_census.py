@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import sys
 import glob
 import pandas as pd
-from preprocess import remove_bracket
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from preprocess import remove_bracket, check_encoding  # nopep8
 
 
 def create_census(path: str):
-    df = pd.read_csv(path, encoding="shift-jis")
+    try:
+        df = pd.read_csv(path, encoding="shift-jis")
+    except:
+        char_code = check_encoding(path)
+        df = pd.read_csv(path, encoding=char_code)
     df = df.iloc[:, 1:]
     columns = get_columns_from_census(df, 2, 3)
     df.columns = columns
@@ -60,7 +67,7 @@ if __name__ == '__main__':
     key_latlon_path = "/home/vagrant/share/data/census/key_latlon.csv"
     df_key_latlon = pd.read_csv(key_latlon_path)
 
-    census_path = "/home/vagrant/share/data/census/*"
+    census_path = "/home/vagrant/share/data/census/2015/*"
     file_paths = glob.glob(census_path)
     file_paths.sort()
     all_data = []
@@ -74,7 +81,6 @@ if __name__ == '__main__':
     df = pd.concat(all_data, axis=0)
     df.reset_index(drop=True, inplace=True)
     df['key_code'] = df['key_code'].astype(int)
-    df = pd.merge(df, df_key_latlon, on='key_code', how='inner')
 
     for c in df.columns:
         df[c] = df[c].mask(df[c] == '-', 0)
@@ -86,7 +92,19 @@ if __name__ == '__main__':
             except:
                 pass
 
+    # create index
+    df = pd.merge(df, df_key_latlon, on='key_code', how='inner')
+    single_rate = df['一般世帯数_単独世帯'] / df['一般世帯数_総数（世帯の家族類型）']
+    less_than_6age_rate = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+        df['一般世帯数_総数（世帯の家族類型）']
+    less_than_18age_rate = df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+        df['一般世帯数_総数（世帯の家族類型）']
+
+    df['single_rate'] = single_rate
+    df['less_than_6age_rate'] = less_than_6age_rate
+    df['less_than_18age_rate'] = less_than_18age_rate
+
     # Save data
-    save_path = "../data/census.csv"
+    save_path = "../../data/census.csv"
     df.to_csv(save_path, index=False)
     print("Done!")

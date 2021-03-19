@@ -4,6 +4,45 @@
 import time
 import xmltodict
 import pandas as pd
+from geopy import distance
+from chardet.universaldetector import UniversalDetector
+
+
+one_km_latitude = 0.0090133729745762
+one_km_longitude = 0.010966404715491394
+
+
+def cal_minmax_latlon(lat, lon, dist_range):
+    min_lat = lat - one_km_latitude * dist_range
+    max_lat = lat + one_km_latitude * dist_range
+    min_lon = lon - one_km_longitude * dist_range
+    max_lon = lon + one_km_longitude * dist_range
+    return min_lat, max_lat, min_lon, max_lon
+
+
+def select_by_mesh(df, lat, lon, dist_range):
+    min_lat, max_lat, min_lon, max_lon = cal_minmax_latlon(
+        lat, lon, dist_range)
+    df = df[(df['lat'] > min_lat) & (df['lat'] < max_lat)]
+    df = df[(df['lon'] > min_lon) & (df['lon'] < max_lon)]
+    if df.shape[0]:
+        for i in df.index:
+            dist = distance.distance([lat, lon], df.loc[i, ['lat', 'lon']]).km
+            if dist > dist_range:
+                df.drop(i, inplace=True)
+        return df
+    else:
+        return None
+
+
+def add_number_of_spot_arround_station(station_name_dict, df, dist_range):
+    for k, v in station_name_dict.items():
+        df_tmp = select_by_mesh(df, v['lat'], v['lon'], dist_range)
+        if type(df_tmp) == pd.DataFrame:
+            station_name_dict[k][cotegory_name+"_num"] = df_tmp.shape[0]
+        else:
+            station_name_dict[k][cotegory_name+"_num"] = 0
+        return station_name_dict
 
 
 def select_by_pref_cd(pref_cd: list, df_station: pd.DataFrame, df_line=None, df_join=None, df_company=None) -> dict:
@@ -151,3 +190,14 @@ def get_latlon(address: str):
         except:
             print(f"Not found latlon in '{address}'")
             return None, None
+
+
+def check_encoding(file_path):
+    detector = UniversalDetector()
+    with open(file_path, mode='rb') as f:
+        for binary in f:
+            detector.feed(binary)
+            if detector.done:
+                break
+    detector.close()
+    return detector.result['encoding']
