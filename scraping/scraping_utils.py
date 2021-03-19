@@ -47,7 +47,8 @@ def scraping_from_navitime(category_id: str, pref_code_list: list) -> pd.DataFra
         page_id = 1
         while True:
             print(f"{pref}, page_id: {page_id}")
-            soup = get_soup(main_url.format(category_id, pref_code, page_id))
+            soup = get_soup(main_url.format(
+                category_id, str(pref_code).zfill(2), page_id))
             spot_contents = soup(class_="spot-content")
             if len(spot_contents) <= 1:
                 break
@@ -73,12 +74,12 @@ def scraping_from_mapfan(category_id: str, pref_code_list: list) -> pd.DataFrame
     info_list = []
     for pref_code in pref_code_list:
         pref = pref_code_to_name[pref_code]
-        soup = get_soup(main_url.format(category_id, pref_code))
+        print(category_id, pref_code)
+        soup = get_soup(main_url.format(category_id, str(pref_code).zfill(2)))
         mun_urls = soup(class_="list ng-star-inserted")[0]('a')
         for mu in mun_urls:
             mun = mu.text.split(" ")[0]
             url = "https://mapfan.com" + mu.get('href')
-            print(f"pref: {pref}, mun:{mun}")
             page_id = 1
             while True:
                 soup = get_soup(url + "?page={}".format(page_id))
