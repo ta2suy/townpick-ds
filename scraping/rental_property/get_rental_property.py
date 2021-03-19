@@ -20,20 +20,21 @@ if __name__ == '__main__':
     today = datetime.date.today()
     year_month = str(today.year) + str(today.month).zfill(2)
     save_path = rental_property_path + \
-        'rental_property_info_{year_month}.pickle'.format()
+        f'rental_property_info_{year_month}.pkl'.format()
 
     if os.path.exists(area_urls_path):
         with open(area_urls_path, 'r') as f:
             area_urls = json.load(f)
 
     else:
+        pref_path = '/home/vagrant/share/data/pref.csv'
+        df_pref = pd.read_csv(pref_path)
+        df_pref.set_index('id', inplace=True)
+        use_id = [8, 9, 10, 19, 20, 22]
+        df_pref = df_pref.loc[use_id]
+        df_pref.set_index('romaji', inplace=True)
+        pref_dict = df_pref['kanji'].to_dict()
         print("get area urls")
-        pref_dict = {
-            'saitama': '埼玉県',
-            'chiba': '千葉県',
-            'tokyo': '東京都',
-            'kanagawa': '神奈川県'
-        }
         area_urls = GetRentalProperty.area_urls(pref_dict)
         with open(area_urls_path, 'w') as f:
             json.dump(area_urls, f, indent=4, ensure_ascii=False)
