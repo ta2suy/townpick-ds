@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import time
+import json
 from restaurant import GetNumRestaurant
 
 
@@ -9,7 +11,12 @@ if __name__ == '__main__':
     gnr = GetNumRestaurant()
     # Load data
     num_restaurant_dict, station_list, unfound_station_dict = gnr.load_dataset()
-
+    rename_station_dict_path = "/home/vagrant/share/data/restaurant/rename_station_dict.json"
+    if os.path.exists(rename_station_dict_path):
+        with open(rename_station_dict_path, 'r') as f:
+            rename_station_dict = json.load(f)
+    else:
+        rename_station_dict = {}
     # Get number of restaurants around the station
     print(f"total station length: {len(station_list)}")
     for i, s in enumerate(station_list):
@@ -22,6 +29,10 @@ if __name__ == '__main__':
         else:
             station = s + "駅"
             check_station = s + "駅"
+        try:
+            check_station = rename_station_dict[check_station]
+        except:
+            pass
         if check_station in unfound_station_dict.keys():
             print("skip")
             continue
