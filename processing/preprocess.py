@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import time
-import xmltodict
 import pandas as pd
 from geopy import distance
 from chardet.universaldetector import UniversalDetector
@@ -171,25 +170,6 @@ def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame, tag='name
         station2 = set(df_train_schedule['station2_g_cd'].values)
 
     return station1 | station2
-
-
-def get_latlon(address: str):
-    url = 'http://www.geocoding.jp/api/'
-    payload = {'q': address}
-    result = requests.get(url, params=payload)
-    time.sleep(10)
-    resultdict = xmltodict.parse(result.text)
-    try:
-        if resultdict['html']['head']['title'] == "Too Many Requests":
-            return "stop"
-    except:
-        try:
-            lat = resultdict["result"]["coordinate"]["lat"]
-            lon = resultdict["result"]["coordinate"]["lon"]
-            return lat, lon
-        except:
-            print(f"Not found latlon in '{address}'")
-            return None, None
 
 
 def check_encoding(file_path):

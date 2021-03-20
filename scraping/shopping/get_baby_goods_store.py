@@ -11,7 +11,7 @@ from scraping_utils import scraping_from_mapfan  # nopep8
 if __name__ == '__main__':
     # Get baby goods store info
     category_id = "1021"
-    pref_code_list = [8, 9, 10, 19, 20, 22]
+    pref_code_list = [8, 9, 10, 11, 12, 13, 14, 19, 20, 22]
     df_baby_goods_store = scraping_from_mapfan(category_id, pref_code_list)
 
     # Save baby goods store info

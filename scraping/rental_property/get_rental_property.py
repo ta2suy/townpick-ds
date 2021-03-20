@@ -27,7 +27,7 @@ if __name__ == '__main__':
             area_urls = json.load(f)
 
     else:
-        pref_path = '/home/vagrant/share/data/pref.csv'
+        pref_path = '/home/vagrant/share/data/etc/pref.csv'
         df_pref = pd.read_csv(pref_path)
         df_pref.set_index('id', inplace=True)
         use_id = [8, 9, 10, 19, 20, 22]
