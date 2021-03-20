@@ -5,9 +5,10 @@ import os
 import sys
 import json
 import pandas as pd
+from station import get_station_set_in_train_schedule
 sys.path.append(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))))
-from preprocess import *  # nopep8
+from preprocess import create_conversion_dict  # nopep8
 
 
 if __name__ == '__main__':

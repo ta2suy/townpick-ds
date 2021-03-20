@@ -7,9 +7,10 @@ import json
 import time
 import numpy as np
 import pandas as pd
+from station import get_station_set_in_train_schedule
 sys.path.append(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))))
-from preprocess import * # nopep8
+from preprocess import full_to_harf_width_char, remove_bracket  # nopep8
 
 
 if __name__ == '__main__':
