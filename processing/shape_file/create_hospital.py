@@ -4,6 +4,7 @@
 import os
 import sys
 import glob
+import pickle
 import pandas as pd
 import geopandas as gpd
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -75,5 +76,7 @@ if __name__ == '__main__':
     df.columns = column_list
     df = convert_index_to_name(df)
 
-    df.to_csv('../../data/hospital.csv', index=False)
+    pkl_data = (df.to_dict('records'))
+    with open('../../data/hospital.pkl', 'wb') as f:
+        pickle.dump(pkl_data, f)
     print('Done!')
