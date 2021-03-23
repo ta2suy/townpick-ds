@@ -7,7 +7,14 @@ import pandas as pd
 from tabula import read_pdf
 
 
-def str_to_int(df):
+def preprocess(df):
+    for i in df.index:
+        df.loc[i, "市区町村"] = df.loc[i, "市区町村"].replace(
+            " ", "").replace("ケ", "ヶ")
+        if "市" in df.loc[i, "市区町村"] and "区" in df.loc[i, "市区町村"]:
+            df.loc[i, "市区町村"] = df.loc[i, "市区町村"].split("市")[-1]
+        elif "郡" in df.loc[i, "市区町村"]:
+            df.loc[i, "市区町村"] = df.loc[i, "市区町村"].split("郡")[-1]
     if df["刑法犯総数"].dtype == object:
         for i in df.index:
             df.loc[i, "刑法犯総数"] = df.loc[i, "刑法犯総数"].replace(",", "")
@@ -54,12 +61,18 @@ def kanagawa(df_list):
         for ci in range(5):
             if type(df2.iloc[i, ci]) == str:
                 mun += df2.iloc[i, ci]
-        mun_list.append(mun.replace(" ", ""))
+        mun_list.append(mun)
 
     df2.iloc[:, -1]
     df2 = pd.DataFrame([mun_list, df2.iloc[:, -1]]).T
     df2.columns = ['市区町村', '刑法犯総数']
     df = pd.concat([df1, df2], axis=0)
+    df.reset_index(drop=True, inplace=True)
+    delete_index = []
+    for i in df.index:
+        if df.loc[i, "市区町村"][-1] == "郡":
+            delete_index.append(i)
+    df.drop(delete_index, inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -83,7 +96,6 @@ def ibaraki(df_list):
     df.reset_index(inplace=True)
     df.columns = ["市区町村", "刑法犯総数", "1,000人当たり犯罪率"]
     for i in df.index:
-        df.loc[i, '刑法犯総数'] = df.loc[i, '刑法犯総数'].replace(",", "")
         df.loc[i, '1,000人当たり犯罪率'] = df.loc[i, '1,000人当たり犯罪率'].split(' ')[
             0]
     df['1,000人当たり犯罪率'] = df['1,000人当たり犯罪率'].astype(float)
@@ -97,11 +109,13 @@ def gunma(df_list):
     df.dropna(subset=['刑法犯総数'], inplace=True)
     for i in df.index:
         df.loc[i, '刑法犯総数'] = df.loc[i, '刑法犯総数'].split(' ')[-1]
+    idx = df[df['市区町村'] == "中 渋川市"].index
+    df.loc[idx, '市区町村'] = "渋川市"
     return df
 
 
 def yamanashi(df_list):
-    df = df_list[0][['市町村', '平成31・令和元年']]
+    df = df_list[0].iloc[:-1, [0, -1]]
     df.columns = ["市区町村", "刑法犯総数"]
     return df
 
@@ -114,8 +128,6 @@ def nagano(df_list):
     df = df[['全刑法犯', 'Unnamed: 1']]
     df.columns = ["市区町村", "刑法犯総数"]
     df["刑法犯総数"] = df["刑法犯総数"].mask(df["刑法犯総数"] == "-", "0")
-    for i in df.index:
-        df.loc[i, "市区町村"] = df.loc[i, "市区町村"].replace(" ", "")
     return df
 
 
@@ -131,16 +143,16 @@ if __name__ == '__main__':
     files = glob.glob(load_path)
     pref_path = '/home/vagrant/share/data/etc/pref.csv'
     df_pref = pd.read_csv(pref_path)
-    pref_kanji_dict = {df_pref.loc[i, "romaji"]: df_pref.loc[i, "kanji"] for i in df_pref.index}
+    pref_kanji_dict = {df_pref.loc[i, "romaji"]                       : df_pref.loc[i, "kanji"] for i in df_pref.index}
     pref_function_dict = {
-        "saitama": saitama,
-        "chiba": chiba,
-        "kanagawa": kanagawa,
-        "ibaraki": ibaraki,
+        # "saitama": saitama,
+        # "chiba": chiba,
+        # "kanagawa": kanagawa,
+        # "ibaraki": ibaraki,
         "gunma": gunma,
-        "yamanashi": yamanashi,
-        "nagano": nagano,
-        "shizuoka": shizuoka,
+        # "yamanashi": yamanashi,
+        # "nagano": nagano,
+        # "shizuoka": shizuoka,
     }
     for path in files:
         for k, v in pref_function_dict.items():
@@ -149,7 +161,7 @@ if __name__ == '__main__':
                 df_list = read_pdf(path, pages='all')
                 df = v(df_list)
                 df.insert(0, "都道府県", pref_kanji_dict[k])
-                df = str_to_int(df)
+                df = preprocess(df)
                 df.to_csv(save_path + path.split('/')
                           [-1].replace('pdf', 'csv'), index=False)
                 continue
