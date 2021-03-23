@@ -14,6 +14,8 @@ class LatLon():
     def __init__(self):
         self.data_path = "/home/vagrant/share/data/"
         self.latlon_path = self.data_path + "etc/latlon.json"
+        self.unfound_address_latlon_path = self.data_path + \
+            "etc/unfound_address_latlon.json"
         self.unfound_latlon_address_path = self.data_path + \
             "etc/unfound_latlon_address.txt"
         self.get_latlon_list = [
@@ -90,6 +92,27 @@ class LatLon():
             df = pd.merge(df, df_latlon, on="address", how="left")
             df.to_csv(path, index=False)
 
+    def get_latlon_for_unfound(self):
+        df_latlon = pd.DataFrame(self.latlon).T
+        df_latlon.columns = ["lat", "lon"]
+        df_unfound = df_latlon[df_latlon["lat"].isnull()]
+        print(f"total unfound address is {df_unfound.shape[0]}")
+        for address in df_unfound.index:
+            result = self.get_latlon(address)
+            if result == "stop":
+                self.save_latlon()
+                sys.exit("Too Many Requests")
+            else:
+                print(address, result)
+                self.latlon[address] = result
+
+    def complement_latlon(self):
+        if os.path.exists(self.unfound_address_latlon_path):
+            with open(self.unfound_address_latlon_path, "r") as f:
+                unfound_address_latlon = json.load(f)
+            for k, v in unfound_address_latlon.items():
+                self.latlon[k] = v
+
     def main(self, address):
         if " " in address:
             address = address.split(" ")[0]
@@ -117,6 +140,8 @@ if __name__ == '__main__':
             elapsed_time = time.time() - start
             print(f"{i}, elapsed_time:{elapsed_time}[sec]")
             start = time.time()
+    ll.get_latlon_for_unfound()
+    ll.complement_latlon()
 
     # Save latlon
     ll.save_latlon()
