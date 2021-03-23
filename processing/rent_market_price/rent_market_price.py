@@ -132,6 +132,28 @@ class GetAccessInfo:
     def __init__(self, station_set, unfound_station_set):
         self.station_set = station_set
         self.unfound_station_set = unfound_station_set
+        self.except_words_list = ["バス", "乗車", "号線", "IC", "インタ"]
+        self.check_words_list = ["駅", "徒歩"]
+        self.remove_first_char = ["・", "の"]
+        self.remove_words = ["「", "」", "『", "』",
+                             "(", ")", "\u3000", " ", "：", "/", "J"]
+        self.remove_lines = ["R湘南新宿ライン宇須", "つくばエクスプレス", "ゆりかもめ", "北総鉄道",
+                             "千葉都市モノレール", "埼玉高速鉄道", "日暮里舎人ライナー", "東京モノレール", "湘南新宿ライン", "金沢シーサイドライン"]
+        self.station_dict = {
+            '三郷(千葉県)': '三郷(埼玉県)',
+            '平和台(埼玉県)': '平和台(千葉県)',
+            '新町(埼玉県)': '新町(群馬県)',
+            '東武霞ヶ関(埼玉県)': '霞ヶ関(埼玉県)',
+            '三ッ沢上町(神奈川県)': '三ツ沢上町',
+            '京成町屋(東京都)': '町屋',
+            '浦安(東京都)': '浦安(千葉県)',
+            '梅が丘(東京都)': '梅ヶ丘',
+            '東京スカイツリー(東京都)': 'とうきょうスカイツリー',
+            '町屋2丁目(東京都)': '町屋二丁目',
+            '橋本(東京都)': '橋本(神奈川県)',
+            '黒川(東京都)': '黒川(神奈川県)',
+            'こどもの国(東京都)': 'こどもの国(神奈川県)',
+        }
 
     def access_info(self, text: str, pref):
         text = self.check_words(text)
@@ -175,48 +197,22 @@ class GetAccessInfo:
         return station, minutes_walk
 
     def check_words(self, text: str):
-        except_words = ["バス", "乗車", "号線", "IC", "インタ"]
-        check_words = ["駅", "徒歩"]
-        for ew in except_words:
+        for ew in self.except_words_list:
             if ew in text:
                 return None
-        for cw in check_words:
+        for cw in self.check_words_list:
             if not cw in text:
                 return None
         return text
 
     def normalize_station(self, text: str) -> str:
-        remove_first_char = ["・", "の"]
-        remove_words = ["「", "」", "『", "』",
-                        "(", ")", "\u3000", " ", "：", "/", "J"]
-        remove_lines = ["R湘南新宿ライン宇須", "つくばエクスプレス", "ゆりかもめ", "北総鉄道", "千葉都市モノレール",
-                        "埼玉高速鉄道", "日暮里舎人ライナー", "東京モノレール", "湘南新宿ライン", "金沢シーサイドライン"]
-        if text[0] in remove_first_char:
+        if text[0] in self.remove_first_char:
             text = text[1:]
-        for rw in remove_words:
+        for rw in self.remove_words:
             text = text.replace(rw, '')
-        for rl in remove_lines:
+        for rl in self.remove_lines:
             text = text.replace(rl, '')
         return text.replace("ケ", "ヶ")
-
-    def change_station_name(self, text: str) -> str:
-        station_dict = {
-            '三郷(千葉県)': '三郷(埼玉県)',
-            '平和台(埼玉県)': '平和台(千葉県)',
-            '新町(埼玉県)': '新町(群馬県)',
-            '東武霞ヶ関(埼玉県)': '霞ヶ関(埼玉県)',
-            '三ッ沢上町(神奈川県)': '三ツ沢上町',
-            '京成町屋(東京都)': '町屋',
-            '浦安(東京都)': '浦安(千葉県)',
-            '梅が丘(東京都)': '梅ヶ丘',
-            '東京スカイツリー(東京都)': 'とうきょうスカイツリー',
-            '町屋2丁目(東京都)': '町屋二丁目',
-            '橋本(東京都)': '橋本(神奈川県)',
-            '黒川(東京都)': '黒川(神奈川県)',
-            'こどもの国(東京都)': 'こどもの国(神奈川県)',
-            '': '',
-        }
-        return station_dict[text]
 
     def check_exception_station(self, station: str, access, pref):
         if not station in self.station_set:
@@ -237,7 +233,7 @@ class GetAccessInfo:
             else:
                 station = station + "({})".format(pref)
                 try:
-                    station = self.change_station_name(station)
+                    station = self.station_dict[station]
                 except:
                     pass
             if not station in self.station_set:

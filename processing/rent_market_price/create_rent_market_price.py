@@ -11,7 +11,7 @@ from rent_market_price import GetAccessInfo, CreateRentMarketPrice
 
 if __name__ == '__main__':
     # Load data
-    rental_property_path = "/home/vagrant/share/data/rental_property/rental_property_info_202102.pickle"
+    rental_property_path = "/home/vagrant/share/data/rental_property/rental_property_info_2021.pkl"
     with open(rental_property_path, 'rb') as f:
         property_list = pickle.load(f)
     df_property = pd.DataFrame(property_list)
