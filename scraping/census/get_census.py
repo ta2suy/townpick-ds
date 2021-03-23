@@ -37,7 +37,7 @@ def get_pref_urls(url, css_selector):
     for s in soup('a'):
         urls.append(e_stat_url + s.get('href'))
 
-    return urls
+    return urls[:-1]
 
 
 def get_urls(soup, use_index):
@@ -52,6 +52,7 @@ def get_urls(soup, use_index):
                 urls.append(e_stat_url+t('a')[0].get('href'))
         except:
             pass
+    return urls
 
 
 def download_csv(url):
@@ -90,13 +91,12 @@ if __name__ == '__main__':
             pickle.dump(pref_urls, f)
 
     print('get census data')
-    pref_path = '/home/vagrant/share/data/pref.csv'
+    pref_path = '/home/vagrant/share/data/etc/pref.csv'
     df_pref = pd.read_csv(pref_path)
     df_pref.set_index('id', inplace=True)
+    use_index = [3, 6, 7, 8]
 
     for i, pref_url in enumerate(pref_urls):
-        if i == 0:
-            continue
         start = time.time()
         soup = get_soup(pref_url)
         pref_id = soup(
@@ -104,14 +104,16 @@ if __name__ == '__main__':
         dir_name = pref_id + '_' + \
             df_pref.loc[int(pref_id)]['romaji'] + '/'
         dir_path = census_path + dir_name
-        os.makedirs(dir_path, exist_ok=True)
-        use_index = [3, 6, 7, 8]
-        urls = get_urls(soup, use_index)
+        if os.path.exists(dir_path):
+            print(f"{dir_path} already exist")
+            continue
+        else:
+            os.makedirs(dir_path, exist_ok=True)
+            urls = get_urls(soup, use_index)
+            for url in urls:
+                download_csv(url)
 
-        for url in urls:
-            download_csv(url)
-
-        move_files(dir_path, len(use_index))
+            move_files(dir_path, len(use_index))
 
         elasped_time = time.time() - start
         print(dir_name, elasped_time)
