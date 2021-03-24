@@ -21,6 +21,8 @@ if __name__ == '__main__':
     train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     df_train_schedule = pd.read_csv(
         train_schedule_path + 'train_schedule_fix.csv')
+    pref_path = '/home/vagrant/share/data/etc/pref.csv'
+    pref_list = pd.read_csv(pref_path)["kanji"].to_list()
 
     # Create conversion dict
     line_code_to_name = create_conversion_dict(df_line, tag='line')
@@ -38,12 +40,17 @@ if __name__ == '__main__':
         line_cd_list = list(set(df_tmp['line_cd'].values))
         df_tmp = df_tmp.drop_duplicates('address')
         if len(station_g_cd_list) == 1:
+            address = df_tmp['address'].values[0]
+            for p in pref_list:
+                if p in address:
+                    address = address[len(p):]
+                    break
             station_name_dict[s] = {
                 'station_g_cd': int(station_g_cd_list[0]),
                 'line': [line_code_to_name[lc] for lc in line_cd_list],
                 'pref': pref_cd_to_name[df_tmp['pref_cd'].values[0]],
                 'post': df_tmp['post'].values[0],
-                'address': df_tmp['address'].values[0],
+                'address': address,
                 'lat': df_tmp['lat'].values[0],
                 'lon': df_tmp['lon'].values[0],
             }
@@ -51,6 +58,6 @@ if __name__ == '__main__':
             print(s)
 
     # Save station name dict
-    station_name_dict_path = '../data/station_name_dict.json'
+    station_name_dict_path = '../../data/station_name_dict.json'
     with open(station_name_dict_path, 'w') as f:
         json.dump(station_name_dict, f, indent=4, ensure_ascii=False)

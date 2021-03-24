@@ -11,14 +11,28 @@ def preprocess(df):
     for i in df.index:
         df.loc[i, "市区町村"] = df.loc[i, "市区町村"].replace(
             " ", "").replace("ケ", "ヶ")
-        if "市" in df.loc[i, "市区町村"] and "区" in df.loc[i, "市区町村"]:
-            df.loc[i, "市区町村"] = df.loc[i, "市区町村"].split("市")[-1]
-        elif "郡" in df.loc[i, "市区町村"]:
+        if "郡" in df.loc[i, "市区町村"]:
             df.loc[i, "市区町村"] = df.loc[i, "市区町村"].split("郡")[-1]
     if df["刑法犯総数"].dtype == object:
         for i in df.index:
             df.loc[i, "刑法犯総数"] = df.loc[i, "刑法犯総数"].replace(",", "")
         df['刑法犯総数'] = df['刑法犯総数'].astype(int)
+    return df
+
+
+def add_mun_to_ward(df):
+    flag = False
+    for i in df.index:
+        if not flag:
+            if df.loc[i, "市区町村"][-1] == "区":
+                flag = True
+                mun = df.loc[i-1, "市区町村"]
+                df.loc[i, "市区町村"] = mun + df.loc[i, "市区町村"]
+        else:
+            if df.loc[i, "市区町村"][-1] == "区":
+                df.loc[i, "市区町村"] = mun + df.loc[i, "市区町村"]
+            else:
+                flag = False
     return df
 
 
@@ -42,6 +56,7 @@ def chiba(df_list):
     df = df.iloc[3:-2, :2]
     df.columns = ["市区町村", "刑法犯総数"]
     df.reset_index(drop=True, inplace=True)
+    df = add_mun_to_ward(df)
     return df
 
 
@@ -74,6 +89,7 @@ def kanagawa(df_list):
             delete_index.append(i)
     df.drop(delete_index, inplace=True)
     df.reset_index(drop=True, inplace=True)
+    df = add_mun_to_ward(df)
     return df
 
 
@@ -143,16 +159,17 @@ if __name__ == '__main__':
     files = glob.glob(load_path)
     pref_path = '/home/vagrant/share/data/etc/pref.csv'
     df_pref = pd.read_csv(pref_path)
-    pref_kanji_dict = {df_pref.loc[i, "romaji"]                       : df_pref.loc[i, "kanji"] for i in df_pref.index}
+    pref_kanji_dict = {df_pref.loc[i, "romaji"]
+        : df_pref.loc[i, "kanji"] for i in df_pref.index}
     pref_function_dict = {
-        # "saitama": saitama,
-        # "chiba": chiba,
-        # "kanagawa": kanagawa,
-        # "ibaraki": ibaraki,
+        "saitama": saitama,
+        "chiba": chiba,
+        "kanagawa": kanagawa,
+        "ibaraki": ibaraki,
         "gunma": gunma,
-        # "yamanashi": yamanashi,
-        # "nagano": nagano,
-        # "shizuoka": shizuoka,
+        "yamanashi": yamanashi,
+        "nagano": nagano,
+        "shizuoka": shizuoka,
     }
     for path in files:
         for k, v in pref_function_dict.items():

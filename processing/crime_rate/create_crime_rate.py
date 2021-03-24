@@ -4,6 +4,7 @@
 import glob
 import numpy as np
 import pandas as pd
+from convert_pdf_to_csv import add_mun_to_ward
 
 
 def load_population():
@@ -38,6 +39,13 @@ def load_population():
                     tmp.append([df.loc[i, "code"], pref_id_kanji_dict[p_code],
                                 df.loc[i, '市区町村'].replace("ケ", "ヶ"), df.loc[i, '総人口']])
     df_population = pd.DataFrame(tmp, columns=["code", "都道府県", "市区町村", "総人口"])
+    convert_pref = ["北海道", "宮城県", "埼玉県", "千葉県", "神奈川県", "静岡県",
+                    "愛知県", "京都府", "兵庫県", "岡山県", "広島県", "福岡県", "熊本県"]
+    for p in convert_pref:
+        index = df_population[df_population["都道府県"] == p].index
+        if len(index) > 0:
+            df_population.loc[index] = add_mun_to_ward(
+                df_population.loc[index])
 
     tokyo_index = []
     for i in df.index:
@@ -63,6 +71,18 @@ def summarize_tokyo(df, df_tokyo):
     return df
 
 
+def remove_ordinance_designated_city(df):
+    ordinance_designated_city = [
+        "札幌市", "仙台市", "さいたま市", "千葉市", "横浜市", "川崎市", "相模原市", "新潟市", "静岡市", "浜松市", "名古屋市", "京都市", "大阪市", "堺市", "神戸市", "岡山市", "広島市", "北九州市", "福岡市", "熊本市"
+    ]
+    delete_index = []
+    for city in ordinance_designated_city:
+        delete_index.extend(df[df["市区町村"] == city].index)
+    df.drop(delete_index, inplace=True)
+    df.reset_index(drop=True, inplace=True)
+    return df
+
+
 if __name__ == "__main__":
     df_population, df_tokyo = load_population()
     crime_rate_path = "/home/vagrant/share/data/crime_rate/csv/*.csv"
@@ -77,7 +97,8 @@ if __name__ == "__main__":
             df = df[["都道府県", "市区町村", "刑法犯総数"]]
         array = np.vstack((array, df.values))
     df_crime_rate = pd.DataFrame(array, columns=["都道府県", "市区町村", "刑法犯総数"])
+    df_crime_rate = remove_ordinance_designated_city(df_crime_rate)
     df_crime_rate = pd.merge(df_population, df_crime_rate, how="right")
     df_crime_rate['犯罪率(件/1000人)'] = df_crime_rate['刑法犯総数'] / \
         df_crime_rate['総人口'] * 1000
-    df_crime_rate.to_csv("../../data/crime_rate.csv")
+    df_crime_rate.to_csv("../../data/crime_rate.csv", index=False)
