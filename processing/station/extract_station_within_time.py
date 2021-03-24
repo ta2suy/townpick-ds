@@ -80,24 +80,24 @@ if __name__ == '__main__':
         drop=True)
 
     # Extract stations within time required
-    extracted_stations_dict = {}
+    extracted_station = {}
     count_num = 0
     print(f"total station length: {len(station_g_code_dict)}")
 
     for sgc, scd in station_g_code_dict.items():
         count_num += 1
         start = time.time()
-        extracted_stations_list = []
+        extracted_station_list = []
         accum_time = 0
         num_transfer = 0
         line_cd_list = copy.copy(scd['line_cd'])
 
         # Extract stations　without transfer
         for lc in line_cd_list:
-            extracted_stations_list = extract_stations_within_time(
-                df_train_schedule, lc, sgc, accum_time, args.max_time, num_transfer, extracted_stations_list)
+            extracted_station_list = extract_stations_within_time(
+                df_train_schedule, lc, sgc, accum_time, args.max_time, num_transfer, extracted_station_list)
 
-        df_tmp = list_to_df(extracted_stations_list, sort_col=[
+        df_tmp = list_to_df(extracted_station_list, sort_col=[
                             'time_required', 'number_of_transfers'], drop_col='station_g_cd')
         loop_flag = True
 
@@ -124,17 +124,17 @@ if __name__ == '__main__':
             else:
                 df_tmp = list_to_df(tmp_list, sort_col=[
                                     'time_required', 'number_of_transfers'], drop_col='station_g_cd')
-                extracted_stations_list.extend(tmp_list)
+                extracted_station_list.extend(tmp_list)
 
-        df_tmp = list_to_df(extracted_stations_list, sort_col=[
+        df_tmp = list_to_df(extracted_station_list, sort_col=[
                             'time_required', 'number_of_transfers'], drop_col='station_g_cd')
-        extracted_stations_dict[sgc] = df_tmp.to_dict(orient='records')
+        extracted_station[sgc] = df_tmp.to_dict(orient='records')
 
         elapsed_time = time.time() - start
         print(
             f"{count_num}, {sgc, scd['station']}, elapsed_time:{elapsed_time}[sec]")
 
     # Save extracted stations
-    with open('../../data/extracted_stations_dict.pickle', 'wb') as f:
-        pickle.dump(extracted_stations_dict, f)
+    with open('../../data/extracted_station.pickle', 'wb') as f:
+        pickle.dump(extracted_station, f)
     print("Done!")

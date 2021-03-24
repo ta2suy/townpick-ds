@@ -71,17 +71,17 @@ if __name__ == '__main__':
 
     # Create rent market price
     print("Start to create rent market price")
-    # Load rent_market_price_dict if it exits
-    rent_market_price_dict_path = data_path + "rent_market_price_dict.json"
-    if os.path.exists(rent_market_price_dict_path):
-        with open(rent_market_price_dict_path, 'r') as f:
-            rent_market_price_dict = json.load(f)
-        print("load rent_market_price_dict")
+    # Load rent_market_price if it exits
+    rent_market_price_path = data_path + "rent_market_price.json"
+    if os.path.exists(rent_market_price_path):
+        with open(rent_market_price_path, 'r') as f:
+            rent_market_price = json.load(f)
+        print("load rent_market_price")
     else:
-        rent_market_price_dict = {}
+        rent_market_price = {}
 
     station_list = [k for k, v in station_property_dict.items()
-                    if 'rental_property' in v.keys() and not k in rent_market_price_dict.keys()]
+                    if 'rental_property' in v.keys() and not k in rent_market_price.keys()]
     floor_plan_set = set()
     for unit in df_property['units']:
         for u in unit:
@@ -110,18 +110,18 @@ if __name__ == '__main__':
                             tmp_dict[pk][yk][mk] = {}
                         tmp_dict[pk][yk][mk] = crmp.get_rent_price(
                             units)
-        rent_market_price_dict[s] = tmp_dict
+        rent_market_price[s] = tmp_dict
         elapsed_time = time.time() - start
         print(f"elapsed_time:{elapsed_time}[sec]")
 
         if i != 0 and i % 10 == 0:
-            with open(rent_market_price_dict_path, 'w') as f:
-                json.dump(rent_market_price_dict, f,
+            with open(rent_market_price_path, 'w') as f:
+                json.dump(rent_market_price, f,
                           indent=4, ensure_ascii=False)
             print("Save dicts until now!")
             print()
 
-    # Save rent_market_price_dicts
-    with open(rent_market_price_dict_path, 'w') as f:
-        json.dump(rent_market_price_dict, f, indent=4, ensure_ascii=False)
+    # Save rent_market_prices
+    with open(rent_market_price_path, 'w') as f:
+        json.dump(rent_market_price, f, indent=4, ensure_ascii=False)
     print("Done!")
