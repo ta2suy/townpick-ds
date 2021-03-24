@@ -32,17 +32,7 @@ def select_by_mesh(df, lat, lon, dist_range):
         return df
     else:
         return None
-
-
-def add_number_of_spot_arround_station(station_name_dict, df, dist_range):
-    for k, v in station_name_dict.items():
-        df_tmp = select_by_mesh(df, v['lat'], v['lon'], dist_range)
-        if type(df_tmp) == pd.DataFrame:
-            station_name_dict[k][cotegory_name+"_num"] = df_tmp.shape[0]
-        else:
-            station_name_dict[k][cotegory_name+"_num"] = 0
-        return station_name_dict
-
+        
 
 def select_by_pref_cd(pref_cd: list, df_station: pd.DataFrame, df_line=None, df_join=None, df_company=None) -> dict:
     delete_index = [i for i, pc in enumerate(
@@ -120,14 +110,6 @@ def get_first_and_last_pref_cd(df_pref: pd.DataFrame, df_station: pd.DataFrame, 
     return first_station_pref_cd, last_station_pref_cd
 
 
-def change_duplicated_station_name(df_station: pd.DataFrame, ):
-    pref_code_to_name = create_conversion_dict(df_pref, tag='pref')
-    df_drop_duplicates = df_station.drop_duplicates(
-        ['station_name', 'pref_cd'])
-    df_duplicate = df_drop_duplicates[df_drop_duplicates.duplicated(
-        ['station_name'], keep=False)]
-
-
 def remove_bracket(text: str) -> str:
     bracket_patterns_front = ['(', '（', '〈']
     bracket_patterns_end = [')', '）', '〉']
@@ -157,21 +139,6 @@ def list_to_df(list: list, sort_col, drop_col):
     return df
 
 
-def get_station_set_in_train_schedule(df_train_schedule: pd.DataFrame, tag='name') -> set:
-    tag_list = ['name', 'code']
-    if not tag in tag_list:
-        raise ValueError(f'wrong tag values, please select from {tag_list}')
-
-    if tag == 'name':
-        station1 = set(df_train_schedule['station1'].values)
-        station2 = set(df_train_schedule['station2'].values)
-    elif tag == 'code':
-        station1 = set(df_train_schedule['station1_g_cd'].values)
-        station2 = set(df_train_schedule['station2_g_cd'].values)
-
-    return station1 | station2
-
-
 def check_encoding(file_path):
     detector = UniversalDetector()
     with open(file_path, mode='rb') as f:
@@ -181,3 +148,11 @@ def check_encoding(file_path):
                 break
     detector.close()
     return detector.result['encoding']
+
+
+def convert_point_to_latlon(df):
+    df_tmp = pd.concat([df['geometry'].y, df['geometry'].x], axis=1)
+    df_tmp.columns = ['lat', 'lon']
+    df.drop(columns='geometry', inplace=True)
+    df = pd.concat([df, df_tmp], axis=1)
+    return df
