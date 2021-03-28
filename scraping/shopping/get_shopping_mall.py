@@ -9,15 +9,12 @@ from scraping_utils import scraping_from_navitime, scraping_from_mapfan  # nopep
 
 
 if __name__ == '__main__':
-    # # Get shopping mall info from navitime
-    # category_id = "0205001"
-    # pref_code_list = [i for i in range(11, 15)]
-    # df_shopping_mall = scraping_from_navitime(category_id, pref_code_list)
-
     # Get shopping mall info from mapfan
     category_id = "64"
-    pref_code_list = [8, 9, 10, 19, 20, 22]
+    pref_code_list = [8, 9, 10, 11, 12, 13, 14, 19, 20, 22]
     df_shopping_mall = scraping_from_mapfan(category_id, pref_code_list)
+    df_shopping_mall.drop_duplicates("name", inplace=True)
+    df_shopping_mall.reset_index(drop=True, inplace=True)
 
     # Save shopping mall info
     directory_path = "/home/vagrant/share/data/shopping/"

@@ -13,6 +13,8 @@ if __name__ == '__main__':
     category_id = "1021"
     pref_code_list = [8, 9, 10, 11, 12, 13, 14, 19, 20, 22]
     df_baby_goods_store = scraping_from_mapfan(category_id, pref_code_list)
+    df_baby_goods_store.drop_duplicates("name", inplace=True)
+    df_baby_goods_store.reset_index(drop=True, inplace=True)
 
     # Save baby goods store info
     directory_path = "/home/vagrant/share/data/shopping/"

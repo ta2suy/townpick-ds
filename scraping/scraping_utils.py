@@ -91,8 +91,11 @@ def scraping_from_mapfan(category_id: str, pref_code_list: list) -> pd.DataFrame
                     page_id += 1
                 for facility in facility_list:
                     info_dict = {}
-                    info_dict['name'] = facility(
+                    name = facility(
                         class_="mat-line name mat-subheading-1")[0].text
+                    while name[0] == " ":
+                        name = name[1:]
+                    info_dict['name'] = name
                     info_dict['address'] = facility(
                         class_="mat-line address")[0].text
                     info_dict['category'] = facility(class_='mat-line genre-name ng-star-inserted')[
