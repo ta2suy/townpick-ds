@@ -9,7 +9,7 @@ import pickle
 import argparse
 import pandas as pd
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from preprocess import *  # nopep8
+from preprocess import list_to_df  # nopep8
 
 
 def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list) -> list:
@@ -66,13 +66,15 @@ if __name__ == '__main__':
     parser.add_argument(
         '--max_transfer', default=5, type=int, help='max number of transfer')
     args = parser.parse_args()
+    max_time = args.max_time
+    max_transfer = args.max_transfer
 
     # Load data
     train_schedule_path = '/home/vagrant/share/data/train_schedule/'
     df_train_schedule = pd.read_csv(
         train_schedule_path + 'train_schedule_fix.csv')
 
-    with open('../../data/station_g_cd_dict.pickle', 'rb') as f:
+    with open('../../data/station_g_cd_dict.pkl', 'rb') as f:
         station_g_code_dict = pickle.load(f)
 
     # Remove limited express line
@@ -87,7 +89,13 @@ if __name__ == '__main__':
     for sgc, scd in station_g_code_dict.items():
         count_num += 1
         start = time.time()
-        extracted_station_list = []
+        extracted_station_list = [{
+            'station_g_cd': sgc,
+            'time_required': 0,
+            'number_of_transfers': 0,
+            'line_used': None,
+            'transfer_station': None,
+        }]
         accum_time = 0
         num_transfer = 0
         line_cd_list = copy.copy(scd['line_cd'])
@@ -95,7 +103,7 @@ if __name__ == '__main__':
         # Extract stations　without transfer
         for lc in line_cd_list:
             extracted_station_list = extract_stations_within_time(
-                df_train_schedule, lc, sgc, accum_time, args.max_time, num_transfer, extracted_station_list)
+                df_train_schedule, lc, sgc, accum_time, max_time, num_transfer, extracted_station_list)
 
         df_tmp = list_to_df(extracted_station_list, sort_col=[
                             'time_required', 'number_of_transfers'], drop_col='station_g_cd')
@@ -103,7 +111,7 @@ if __name__ == '__main__':
 
         # Extract stations with one or more transfers
         while(loop_flag):
-            if num_transfer > args.max_transfer:
+            if num_transfer > max_transfer:
                 break
 
             num_transfer += 1
@@ -117,7 +125,7 @@ if __name__ == '__main__':
                     else:
                         line_cd_list.append(lc)
                         tmp_list = extract_stations_within_time(
-                            df_train_schedule, lc, tmp_sgc, accum_time, args.max_time, num_transfer, tmp_list)
+                            df_train_schedule, lc, tmp_sgc, accum_time, max_time, num_transfer, tmp_list)
 
             if len(tmp_list) == 0:
                 loop_flag = False
@@ -135,6 +143,6 @@ if __name__ == '__main__':
             f"{count_num}, {sgc, scd['station']}, elapsed_time:{elapsed_time}[sec]")
 
     # Save extracted stations
-    with open('../../data/extracted_station.pickle', 'wb') as f:
+    with open(f'../../data/extracted_station_time{max_time}_transfer_{max_transfer}.pkl', 'wb') as f:
         pickle.dump(extracted_station, f)
     print("Done!")

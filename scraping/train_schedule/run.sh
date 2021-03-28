@@ -19,10 +19,10 @@ echo "Start to create unfound line station info"
 python create_unfound_line_station_info.py
 
 echo "Start to get station line urls in unfound line station info"
-python get_station_line_urls.py --csvfile unfound_line_station_info.csv --picklefile unfound_station_line_urls.pickle
+python get_station_line_urls.py --csvfile unfound_line_station_info.csv --picklefile unfound_station_line_urls.pkl
 
 echo "Start to get timetable urls in unfound line station info"
 python get_timetable_urls.py --csvfile unfound_line_station_info.csv
 
 echo "Start to get train schedule in unfound line station info"
-python get_train_schedule.py --loadfile unfound_line_station_info.csv --picklefile train_schedule_in_unfound.pickle --savefile train_schedule_in_unfound.csv
+python get_train_schedule.py --loadfile unfound_line_station_info.csv --picklefile train_schedule_in_unfound.pkl --savefile train_schedule_in_unfound.csv

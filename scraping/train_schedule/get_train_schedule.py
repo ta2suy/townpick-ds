@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--loadfile', default='line_station_info.csv', help='load csv file')
     parser.add_argument(
-        '--picklefile', default='train_schedule.pickle', help='load and save pickle file')
+        '--picklefile', default='train_schedule.pkl', help='load and save pickle file')
     parser.add_argument(
         '--savefile', default='train_schedule.csv', help='save csv file')
     args = parser.parse_args()
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     unfound_train_schedule = []
 
     # Check if station line urls file exists
-    train_schedule_pickle_path = train_schedule_path + args.picklefile
+    train_schedule_pickle_path = train_schedule_path + args.pklfile
     if os.path.exists(train_schedule_pickle_path):
         with open(train_schedule_pickle_path, 'rb') as f:
             train_schedule = pickle.load(f)

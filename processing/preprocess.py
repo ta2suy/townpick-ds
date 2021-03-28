@@ -29,10 +29,8 @@ def select_by_mesh(df, lat, lon, dist_range):
             dist = distance.distance([lat, lon], df.loc[i, ['lat', 'lon']]).km
             if dist > dist_range:
                 df.drop(i, inplace=True)
-        return df
-    else:
-        return None
-        
+    return df
+
 
 def select_by_pref_cd(pref_cd: list, df_station: pd.DataFrame, df_line=None, df_join=None, df_company=None) -> dict:
     delete_index = [i for i, pc in enumerate(

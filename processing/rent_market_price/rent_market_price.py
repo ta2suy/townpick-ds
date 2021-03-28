@@ -17,11 +17,11 @@ class CreateRentMarketPrice:
         self.station_property_dict = station_property_dict
         self.this_year = datetime.date.today().year
         self.floor_plan_dict = {
-            "1R_1DK": ['1R', '1K', '1SK', '1DK', '1SDK', '1LK', '1SLK'],
-            "1LDK_2DK": ['1LDK', '1SLDK', '2K', '2SK', '2DK', '2SDK', '2LK', '2SLK'],
-            "2LDK_3DK": ['2LDK', '2SLDK', '3K', '3SK', '3DK', '3SDK', '3LK', '3SLK'],
-            "3LDK_4DK": ['3LDK', '3SLDK', '4K', '4SK', '4DK', '4SDK'],
-            "4LDK_": list(floor_plan_set)
+            "1R~1DK": ['1R', '1K', '1SK', '1DK', '1SDK', '1LK', '1SLK'],
+            "1LDK~2DK": ['1LDK', '1SLDK', '2K', '2SK', '2DK', '2SDK', '2LK', '2SLK'],
+            "2LDK~3DK": ['2LDK', '2SLDK', '3K', '3SK', '3DK', '3SDK', '3LK', '3SLK'],
+            "3LDK~4DK": ['3LDK', '3SLDK', '4K', '4SK', '4DK', '4SDK'],
+            "4LDK~": list(floor_plan_set)
         }
         self.occupied_area_dict = {
             "x<=10㎡": 10,

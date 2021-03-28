@@ -42,6 +42,6 @@ if __name__ == '__main__':
         }
 
     # Save station group code dict
-    station_g_code_dict_path = '../data/station_g_cd_dict.pickle'
+    station_g_code_dict_path = '../data/station_g_cd_dict.pkl'
     with open(station_g_code_dict_path, 'wb') as f:
         pickle.dump(station_g_code_dict, f)

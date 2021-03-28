@@ -41,9 +41,9 @@ class LatLon():
         if os.path.exists(self.unfound_latlon_address_path):
             with open(self.unfound_latlon_address_path, "r") as f:
                 content = f.readlines()
-            unfound_latlon_address = set(x.strip() for x in content)
+            self.unfound_latlon_address = set(x.strip() for x in content)
         else:
-            unfound_latlon_address = set()
+            self.unfound_latlon_address = set()
 
         # Check json data
         if os.path.exists(self.latlon_path):
@@ -54,7 +54,6 @@ class LatLon():
             self.latlon = {}
 
         address_set = address_set - set(self.latlon.keys())
-        address_set = address_set - unfound_latlon_address
         return address_set
 
     def get_latlon(self, address: str):
@@ -62,25 +61,41 @@ class LatLon():
         payload = {"q": address}
         result = requests.get(url, params=payload)
         time.sleep(10)
-        resultdict = xmltodict.parse(result.text)
+        try:
+            resultdict = xmltodict.parse(result.text)
+        except:
+            print(f"Don't get xml {result.text} in '{address}'")
+            return "skip"
         try:
             if resultdict["html"]["head"]["title"] == "Too Many Requests":
-                return "stop"
+                return None, None
         except:
             try:
                 lat = resultdict["result"]["coordinate"]["lat"]
                 lon = resultdict["result"]["coordinate"]["lng"]
                 return lat, lon
             except:
-                with open(self.unfound_latlon_address_path, "a") as f:
-                    print(address, file=f)
                 print(f"Not found latlon in '{address}'")
                 return None, None
 
     def save_latlon(self):
         with open(self.latlon_path, "w") as f:
             json.dump(self.latlon, f, indent=4, ensure_ascii=False)
-            print("Save latlon up to now")
+        with open(self.unfound_latlon_address_path, "w") as f:
+            f.writelines([t + "\n" for t in self.unfound_latlon_address])
+        print("Save latlon up to now")
+
+    def get_latlon_for_unfound(self):
+        print(f"total unfound address is {len(self.unfound_latlon_address)}")
+        for address in self.unfound_latlon_address:
+            self.main(address)
+
+    def complement_latlon(self):
+        if os.path.exists(self.unfound_address_latlon_path):
+            with open(self.unfound_address_latlon_path, "r") as f:
+                unfound_address_latlon = json.load(f)
+            for k, v in unfound_address_latlon.items():
+                self.latlon[k] = v
 
     def add_latlon_to_csv(self):
         df_latlon = pd.DataFrame(self.latlon).T
@@ -92,27 +107,6 @@ class LatLon():
             df = pd.merge(df, df_latlon, on="address", how="left")
             df.to_csv(path, index=False)
 
-    def get_latlon_for_unfound(self):
-        df_latlon = pd.DataFrame(self.latlon).T
-        df_latlon.columns = ["lat", "lon"]
-        df_unfound = df_latlon[df_latlon["lat"].isnull()]
-        print(f"total unfound address is {df_unfound.shape[0]}")
-        for address in df_unfound.index:
-            result = self.get_latlon(address)
-            if result == "stop":
-                self.save_latlon()
-                sys.exit("Too Many Requests")
-            else:
-                print(address, result)
-                self.latlon[address] = result
-
-    def complement_latlon(self):
-        if os.path.exists(self.unfound_address_latlon_path):
-            with open(self.unfound_address_latlon_path, "r") as f:
-                unfound_address_latlon = json.load(f)
-            for k, v in unfound_address_latlon.items():
-                self.latlon[k] = v
-
     def main(self, address):
         if " " in address:
             address = address.split(" ")[0]
@@ -120,8 +114,12 @@ class LatLon():
         if result == "stop":
             self.save_latlon()
             sys.exit("Too Many Requests")
+        elif result[0] == None:
+            self.unfound_latlon_address.add(address)
         else:
             self.latlon[address] = result
+            if address in self.unfound_latlon_address:
+                self.unfound_latlon_address.remove(address)
 
 
 if __name__ == '__main__':

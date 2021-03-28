@@ -95,14 +95,14 @@ if __name__ == '__main__':
     # create index
     df = pd.merge(df, df_key_latlon, on='key_code', how='inner')
     single_rate = df['一般世帯数_単独世帯'] / df['一般世帯数_総数（世帯の家族類型）']
-    less_than_6age_rate = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+    rate_0_5age = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
         df['一般世帯数_総数（世帯の家族類型）']
-    less_than_18age_rate = df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+    rate_6_18age = df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
         df['一般世帯数_総数（世帯の家族類型）']
 
     df['single_rate'] = single_rate
-    df['less_than_6age_rate'] = less_than_6age_rate
-    df['less_than_18age_rate'] = less_than_18age_rate
+    df['0~5age_rate'] = rate_0_5age
+    df['6~18age_rate'] = rate_6_18age - rate_0_5age
 
     # Save data
     save_path = "../../data/census.csv"
