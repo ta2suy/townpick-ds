@@ -6,103 +6,115 @@ import sys
 import glob
 import pandas as pd
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from preprocess import remove_bracket, check_encoding  # nopep8
+from preprocess import remove_bracket  # nopep8
 
 
-def create_census(path: str):
-    try:
-        df = pd.read_csv(path, encoding="shift-jis")
-    except:
-        char_code = check_encoding(path)
-        df = pd.read_csv(path, encoding=char_code)
-    df = df.iloc[:, 1:]
-    columns = get_columns_from_census(df, 2, 3)
-    df.columns = columns
-    df = df.iloc[4:]
-    df['地域識別番号'] = df['地域識別番号'].astype(int)
-    df = df[df['地域識別番号'] != 1]
-    remove_mark = ['X', '-']
-    for rm in remove_mark:
-        df = df[df['一般世帯数_総数（世帯の家族類型）'] != rm]
+class CreateCensus:
+    def __init__(self, use_pref):
+        self.use_pref = use_pref
+        self.census_path = "/home/vagrant/share/data/census/"
 
-    town_set = set(df[df['地域識別番号'] == 3]['市区町村名'] +
-                   df[df['地域識別番号'] == 3]['大字・町名'])
-    delete_index = []
-    for i in df[df['地域識別番号'] == 2]['大字・町名'].index:
-        if type(df.loc[i, '大字・町名']) != str:
-            delete_index.append(i)
-        elif df.loc[i, '市区町村名']+df.loc[i, '大字・町名'] in town_set:
-            delete_index.append(i)
+    def load_data(self):
+        key_latlon_path = self.census_path + "key_latlon.csv"
+        self.df_key_latlon = pd.read_csv(key_latlon_path)
+        dir_paths = glob.glob(self.census_path + "2015/*")
+        dir_paths.sort()
+        all_data = []
+        for p in dir_paths[:-1]:
+            if p.split("/")[-1][:2] in self.use_pref:
+                path = glob.glob(p+"/006_*")[0]
+                print(path)
+                try:
+                    df = pd.read_csv(path, encoding="shift-jis")
+                except:
+                    df = pd.read_csv(path, encoding="CP932")
+                df = df.iloc[:, 1:]
+                columns = self.get_columns_from_census(df, 2, 3)
+                df.columns = columns
+                df = df.iloc[4:]
+                all_data.append(df)
 
-    df.drop(delete_index, inplace=True)
-    df.reset_index(drop=True, inplace=True)
+        df = pd.concat(all_data, axis=0)
+        df.reset_index(drop=True, inplace=True)
 
-    df['key_code'] = df['市区町村コード']+df['町丁字コード']
+        return df
 
-    return df
+    def get_columns_from_census(self, df, category_row, columns_row):
+        columns = []
+        columns_num = []
+        for c in df.loc[category_row][df.loc[category_row].notnull()].index:
+            columns_num.append(df.columns.get_loc(c))
 
+        for i in range(len(columns_num)):
+            if i == 0:
+                columns.extend(df.iloc[columns_row, :columns_num[i]].values)
+            else:
+                tmp = df.iloc[columns_row, columns_num[i-1]
+                    :columns_num[i]].values
+                cotegory = remove_bracket(
+                    df.iloc[category_row, columns_num[i-1]])
+                columns.extend([cotegory+"_"+t for t in tmp])
+            if i == len(columns_num)-1:
+                tmp = df.iloc[columns_row, columns_num[i]:].values
+                cotegory = remove_bracket(
+                    df.iloc[category_row, columns_num[i]])
+                columns.extend([cotegory+"_"+t for t in tmp])
+        return columns
 
-def get_columns_from_census(df, category_row, columns_row):
-    columns = []
-    columns_num = []
-    for c in df.loc[category_row][df.loc[category_row].notnull()].index:
-        columns_num.append(df.columns.get_loc(c))
+    def preprocess(self, df):
+        df['地域識別番号'] = df['地域識別番号'].astype(int)
+        df = df[df['地域識別番号'] != 1]
+        remove_mark = ['X', '-']
+        for rm in remove_mark:
+            df = df[df['一般世帯数_総数（世帯の家族類型）'] != rm]
+        town_set = set(df[df['地域識別番号'] == 3]['市区町村名'] +
+                       df[df['地域識別番号'] == 3]['大字・町名'])
+        delete_index = []
+        for i in df[df['地域識別番号'] == 2]['大字・町名'].index:
+            if type(df.loc[i, '大字・町名']) != str:
+                delete_index.append(i)
+            elif df.loc[i, '市区町村名']+df.loc[i, '大字・町名'] in town_set:
+                delete_index.append(i)
+        df.drop(delete_index, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        df['key_code'] = df['市区町村コード']+df['町丁字コード']
+        df['key_code'] = df['key_code'].astype(int)
+        for c in df.columns:
+            df[c] = df[c].mask(df[c] == '-', 0)
+            try:
+                df[c] = df[c].astype(int)
+            except:
+                try:
+                    df[c] = df[c].astype(float)
+                except:
+                    pass
+        return df
 
-    for i in range(len(columns_num)):
-        if i == 0:
-            columns.extend(df.iloc[columns_row, :columns_num[i]].values)
-        else:
-            tmp = df.iloc[columns_row, columns_num[i-1]:columns_num[i]].values
-            cotegory = remove_bracket(df.iloc[category_row, columns_num[i-1]])
-            columns.extend([cotegory+"_"+t for t in tmp])
-        if i == len(columns_num)-1:
-            tmp = df.iloc[columns_row, columns_num[i]:].values
-            cotegory = remove_bracket(df.iloc[category_row, columns_num[i]])
-            columns.extend([cotegory+"_"+t for t in tmp])
-    return columns
+    def create_index(self, df):
+        df = pd.merge(df, self.df_key_latlon, on='key_code', how='inner')
+        single_rate = df['一般世帯数_単独世帯'] / df['一般世帯数_総数（世帯の家族類型）']
+        rate_0_5age = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+            df['一般世帯数_総数（世帯の家族類型）']
+        rate_6_18age = (df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] -
+                        df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）']) / df['一般世帯数_総数（世帯の家族類型）']
+        df['single_rate'] = single_rate
+        df['0~5age_rate'] = rate_0_5age
+        df['6~18age_rate'] = rate_6_18age
+        return df
 
 
 if __name__ == '__main__':
     # Load data
-    key_latlon_path = "/home/vagrant/share/data/census/key_latlon.csv"
-    df_key_latlon = pd.read_csv(key_latlon_path)
-
-    census_path = "/home/vagrant/share/data/census/2015/*"
-    file_paths = glob.glob(census_path)
-    file_paths.sort()
-    all_data = []
+    use_pref = ["08", "09", "10", "11", "12", "13", "14", "19", "20", "22"]
+    cc = CreateCensus(use_pref)
+    print("load data")
+    df = cc.load_data()
 
     # Create census data
-    for p in file_paths[:-1]:
-        path = glob.glob(p+"/006_*")[0]
-        print(path)
-        all_data.append(create_census(path))
-
-    df = pd.concat(all_data, axis=0)
-    df.reset_index(drop=True, inplace=True)
-    df['key_code'] = df['key_code'].astype(int)
-
-    for c in df.columns:
-        df[c] = df[c].mask(df[c] == '-', 0)
-        try:
-            df[c] = df[c].astype(int)
-        except:
-            try:
-                df[c] = df[c].astype(float)
-            except:
-                pass
-
-    # create index
-    df = pd.merge(df, df_key_latlon, on='key_code', how='inner')
-    single_rate = df['一般世帯数_単独世帯'] / df['一般世帯数_総数（世帯の家族類型）']
-    rate_0_5age = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
-        df['一般世帯数_総数（世帯の家族類型）']
-    rate_6_18age = df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
-        df['一般世帯数_総数（世帯の家族類型）']
-
-    df['single_rate'] = single_rate
-    df['0~5age_rate'] = rate_0_5age
-    df['6~18age_rate'] = rate_6_18age - rate_0_5age
+    print("preprocess data")
+    df = cc.preprocess(df)
+    print("create index")
+    df = cc.create_index(df)
 
     # Save data
     save_path = "../../data/census.csv"
