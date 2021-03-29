@@ -1,0 +1,286 @@
+{
+    "family": {
+        "cost": {
+            "rate": 25,
+            "category": {
+                "rent_market_price": 100
+            }
+        },
+        "transport": {
+            "rate": 15,
+            "category": {
+                "line": {
+                    "rate": 15,
+                    "category": {
+                        "line_num": 100
+                    }
+                },
+                "time": {
+                    "rate": 60,
+                    "category": {
+                        "time_tokyo": 25,
+                        "time_shinagawa": 20,
+                        "time_shinjuku": 20,
+                        "time_shibuya": 20,
+                        "time_ikebukuro": 15
+                    }
+                },
+                "transfer": {
+                    "rate": 25,
+                    "category": {
+                        "transfer_tokyo": 25,
+                        "transfer_shinagawa": 20,
+                        "transfer_shinjuku": 20,
+                        "transfer_shibuya": 20,
+                        "transfer_ikebukuro": 15
+                    }
+                }
+            }
+        },
+        "security": {
+            "rate": 10,
+            "category": {
+                "crime_rate": 100
+            }
+        },
+        "life_convenience": {
+            "rate": 40,
+            "category": {
+                "shopping": {
+                    "rate": 30,
+                    "category": {
+                        "shopping_supermarket": 35,
+                        "shopping_shopping_mall": 35,
+                        "shopping_convenience_store": 10,
+                        "shopping_baby_goods_store": 20
+                    }
+                },
+                "medical": {
+                    "rate": 25,
+                    "category": {
+                        "med_hospital": 40,
+                        "med_clinic_all": 20,
+                        "med_clinic_pediatrics": 40
+                    }
+                },
+                "education": {
+                    "rate": 20,
+                    "category": {
+                        "education_nursery": 60,
+                        "school_primary": 30,
+                        "school_junior_high": 10
+                    }
+                },
+                "city_park": {
+                    "rate": 15,
+                    "category": {
+                        "city_park_area": 25,
+                        "city_park_small": 25,
+                        "city_park_middle": 25,
+                        "city_park_large": 25
+                    }
+                },
+                "restaurant": {
+                    "rate": 10,
+                    "category": {
+                        "restaurant_num": 100
+                    }
+                }
+            }
+        },
+        "household_rate": {
+            "rate": 10,
+            "category": {
+                "census_household_num": 10,
+                "census_0~5age_rate": 45,
+                "census_6~18age_rate": 45
+            }
+        }
+    },
+    "dinks": {
+        "cost": {
+            "rate": 30,
+            "category": {
+                "rent_market_price": 100
+            }
+        },
+        "transport": {
+            "rate": {
+                "commute": 35,
+                "remote": 20
+            },
+            "category": {
+                "line": {
+                    "rate": 15,
+                    "category": {
+                        "line_num": 100
+                    }
+                },
+                "time": {
+                    "rate": 60,
+                    "category": {
+                        "time_tokyo": 25,
+                        "time_shinagawa": 20,
+                        "time_shinjuku": 20,
+                        "time_shibuya": 20,
+                        "time_ikebukuro": 15
+                    }
+                },
+                "transfer": {
+                    "rate": 25,
+                    "category": {
+                        "transfer_tokyo": 25,
+                        "transfer_shinagawa": 20,
+                        "transfer_shinjuku": 20,
+                        "transfer_shibuya": 20,
+                        "transfer_ikebukuro": 15
+                    }
+                }
+            }
+        },
+        "security": {
+            "rate": 10,
+            "category": {
+                "crime_rate": 100
+            }
+        },
+        "life_convenience": {
+            "rate": {
+                "commute": 20,
+                "remote": 35
+            },
+            "category": {
+                "shopping": {
+                    "rate": 35,
+                    "category": {
+                        "shopping_supermarket": 40,
+                        "shopping_shopping_mall": 30,
+                        "shopping_convenience_store": 30
+                    }
+                },
+                "medical": {
+                    "rate": 25,
+                    "category": {
+                        "med_hospital": 30,
+                        "med_clinic_all": 70
+                    }
+                },
+                "city_park": {
+                    "rate": 10,
+                    "category": {
+                        "city_park_area": 25,
+                        "city_park_small": 25,
+                        "city_park_middle": 25,
+                        "city_park_large": 25
+                    }
+                },
+                "restaurant": {
+                    "rate": 30,
+                    "category": {
+                        "restaurant_num": 100
+                    }
+                }
+            }
+        },
+        "household_rate": {
+            "rate": 5,
+            "category": {
+                "census_household_num": 10,
+                "census_dinks_rate": 90
+            }
+        }
+    },
+    "single": {
+        "cost": {
+            "rate": 40,
+            "category": {
+                "rent_market_price": 100
+            }
+        },
+        "transport": {
+            "rate": {
+                "commute": 40,
+                "remote": 25
+            },
+            "category": {
+                "line": {
+                    "rate": 15,
+                    "category": {
+                        "line_num": 100
+                    }
+                },
+                "time": {
+                    "rate": 60,
+                    "category": {
+                        "time_tokyo": 25,
+                        "time_shinagawa": 20,
+                        "time_shinjuku": 20,
+                        "time_shibuya": 20,
+                        "time_ikebukuro": 15
+                    }
+                },
+                "transfer": {
+                    "rate": 25,
+                    "category": {
+                        "transfer_tokyo": 25,
+                        "transfer_shinagawa": 20,
+                        "transfer_shinjuku": 20,
+                        "transfer_shibuya": 20,
+                        "transfer_ikebukuro": 15
+                    }
+                }
+            }
+        },
+        "security": {
+            "rate": 5,
+            "category": {
+                "crime_rate": 100
+            }
+        },
+        "life_convenience": {
+            "rate": {
+                "commute": 10,
+                "remote": 25
+            },
+            "category": {
+                "shopping": {
+                    "rate": 40,
+                    "category": {
+                        "shopping_supermarket": 30,
+                        "shopping_shopping_mall": 10,
+                        "shopping_convenience_store": 60
+                    }
+                },
+                "medical": {
+                    "rate": 25,
+                    "category": {
+                        "med_hospital": 20,
+                        "med_clinic_all": 80
+                    }
+                },
+                "city_park": {
+                    "rate": 5,
+                    "category": {
+                        "city_park_area": 25,
+                        "city_park_small": 25,
+                        "city_park_middle": 25,
+                        "city_park_large": 25
+                    }
+                },
+                "restaurant": {
+                    "rate": 30,
+                    "category": {
+                        "restaurant_num": 100
+                    }
+                }
+            }
+        },
+        "household_rate": {
+            "rate": 5,
+            "category": {
+                "census_household_num": 10,
+                "census_single_rate": 90
+            }
+        }
+    }
+}

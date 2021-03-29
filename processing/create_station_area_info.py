@@ -29,14 +29,14 @@ class CreateStationAreaInfo:
             "clinic": "診療所",
         }
         self.medical_subject_dict = {
-            "internal_medicine": "内科",
+            # "internal_medicine": "内科",
             "pediatrics": "小児科",
-            "gynecology": "婦人科",
+            # "gynecology": "婦人科",
         }
         self.school_category_dict = {
             "primary": "小学校",
             "junior_high": "中学校",
-            "high": "高等学校",
+            # "high": "高等学校",
         }
 
     def load_data(self, remove_pref_list):
