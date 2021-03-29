@@ -48,10 +48,10 @@ class CreateStationAreaInfo:
             self.extracted_stations = pickle.load(f)
         self.df_crime_rate = pd.read_csv(self.data_path + "crime_rate.csv")
         df_census = pd.read_csv(self.data_path + "census.csv")
-        self.df_census = df_census[["lat", "lon", "一般世帯数_総数（世帯の家族類型）", "single_rate",
+        self.df_census = df_census[["lat", "lon", "一般世帯数_総数（世帯の家族類型）", "single_rate", "dinks_rate",
                                     "0~5age_rate", "6~18age_rate"]]
-        self.df_census.columns = ["lat", "lon", "household_num", "single_rate",
-                                  "less_than_6age_rate", "less_than_18age_rate"]
+        self.df_census.columns = ["lat", "lon", "household_num", "single_rate", "dinks_rate",
+                                  "0~5age_rate", "6~18age_rate"]
         self.df_city_park = pd.read_csv(self.data_path + "city_park.csv")
         with open("../data/hospital.pkl", "rb") as f:
             hospital_list = pickle.load(f)
@@ -98,6 +98,8 @@ class CreateStationAreaInfo:
         for self.station, value in self.station_dict.items():
             self.lat = value["lat"]
             self.lon = value["lon"]
+            self.station_dict[self.station]["line_num"] = len(
+                self.station_dict[self.station]["line"])
             for k, v in self.category_dict.items():
                 if k == "crime_rate":
                     v["function"]()
@@ -179,9 +181,9 @@ class CreateStationAreaInfo:
         elif type(self.dist_range) == float:
             key = str(int(self.dist_range*1000))+"m"
         try:
-            self.station_dict[self.station]["restaurant"] = self.restaurant_dict[self.station]["num_restaurant"][key]
+            self.station_dict[self.station]["restaurant_num"] = self.restaurant_dict[self.station]["num_restaurant"][key]
         except:
-            self.station_dict[self.station]["restaurant"] = 0
+            self.station_dict[self.station]["restaurant_num"] = 0
 
     def add_transport(self):
         for tsk, tsv in self.terminal_station.items():
