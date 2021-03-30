@@ -14,46 +14,50 @@ from preprocess import list_to_df  # nopep8
 
 def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list) -> list:
     df_line_tmp = df_train_schedule[df_train_schedule['line_code'] == line_code]
+    line_station_id_set = set(df_line_tmp["line_station_info_id"])
     station1_timetable_id = set(
         df_line_tmp[df_line_tmp['station1_g_cd'] == station_code]['timetable_id'].values)
     station2_timetable_id = set(
         df_line_tmp[df_line_tmp['station2_g_cd'] == station_code]['timetable_id'].values)
     timetable_id_list = list(station1_timetable_id | station2_timetable_id)
-    for ti in timetable_id_list:
-        df_timetable_tmp = df_line_tmp[df_line_tmp['timetable_id'] == ti].reset_index(
-            drop=True)
+    for lsi in line_station_id_set:
+        for ti in timetable_id_list:
+            condition = (df_line_tmp['line_station_info_id'] == lsi) & (
+                df_line_tmp['timetable_id'] == ti)
+            df_timetable_tmp = df_line_tmp[condition].reset_index(
+                drop=True)
 
-        index = df_timetable_tmp[df_timetable_tmp['station1_g_cd']
-                                 == station_code].index
-        if len(index) != 0:
-            tmp_time = accum_time
-            for i in range(index[0], df_timetable_tmp.shape[0]):
-                tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
-                if tmp_time > max_time:
-                    break
-                extracted_station_list.append({
-                    'station_g_cd': df_timetable_tmp.loc[i, 'station2_g_cd'],
-                    'time_required': tmp_time,
-                    'number_of_transfers': num_transfer,
-                    'line_used': df_timetable_tmp.loc[i, 'line_name'],
-                    'transfer_station': station_code,
-                })
+            index = df_timetable_tmp[df_timetable_tmp['station1_g_cd']
+                                     == station_code].index
+            if len(index) != 0:
+                tmp_time = accum_time
+                for i in range(index[0], df_timetable_tmp.shape[0]):
+                    tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                    if tmp_time > max_time:
+                        break
+                    extracted_station_list.append({
+                        'station_g_cd': df_timetable_tmp.loc[i, 'station2_g_cd'],
+                        'time_required': tmp_time,
+                        'number_of_transfers': num_transfer,
+                        'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                        'transfer_station': station_code,
+                    })
 
-        index = df_timetable_tmp[df_timetable_tmp['station2_g_cd']
-                                 == station_code].index
-        if len(index) != 0:
-            tmp_time = accum_time
-            for i in reversed(range(0, index[0]+1)):
-                tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
-                if tmp_time > max_time:
-                    break
-                extracted_station_list.append({
-                    'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
-                    'time_required': tmp_time,
-                    'number_of_transfers': num_transfer,
-                    'line_used': df_timetable_tmp.loc[i, 'line_name'],
-                    'transfer_station': station_code,
-                })
+            index = df_timetable_tmp[df_timetable_tmp['station2_g_cd']
+                                     == station_code].index
+            if len(index) != 0:
+                tmp_time = accum_time
+                for i in reversed(range(0, index[0]+1)):
+                    tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                    if tmp_time > max_time:
+                        break
+                    extracted_station_list.append({
+                        'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
+                        'time_required': tmp_time,
+                        'number_of_transfers': num_transfer,
+                        'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                        'transfer_station': station_code,
+                    })
 
     return extracted_station_list
 
@@ -74,12 +78,12 @@ if __name__ == '__main__':
     df_train_schedule = pd.read_csv(
         train_schedule_path + 'train_schedule_fix.csv')
 
-    with open('../../data/station_g_cd_dict.pkl', 'rb') as f:
-        station_g_code_dict = pickle.load(f)
-
     # Remove limited express line
     df_train_schedule = df_train_schedule[df_train_schedule['additional_fee'] == 0].reset_index(
         drop=True)
+
+    with open('../../data/station_g_cd_dict.pkl', 'rb') as f:
+        station_g_code_dict = pickle.load(f)
 
     # Extract stations within time required
     extracted_station = {}
@@ -143,6 +147,6 @@ if __name__ == '__main__':
             f"{count_num}, {sgc, scd['station']}, elapsed_time:{elapsed_time}[sec]")
 
     # Save extracted stations
-    with open(f'../../data/extracted_station_time{max_time}_transfer_{max_transfer}.pkl', 'wb') as f:
+    with open(f'../../data/extracted_station_time{max_time}_transfer{max_transfer}.pkl', 'wb') as f:
         pickle.dump(extracted_station, f)
     print("Done!")

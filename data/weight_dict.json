@@ -1,7 +1,7 @@
 {
     "family": {
         "cost": {
-            "rate": 25,
+            "rate": 30,
             "category": {
                 "rent_market_price": 100
             }
@@ -44,7 +44,7 @@
             }
         },
         "life_convenience": {
-            "rate": 40,
+            "rate": 35,
             "category": {
                 "shopping": {
                     "rate": 30,
@@ -88,7 +88,7 @@
                 }
             }
         },
-        "household_rate": {
+        "household": {
             "rate": 10,
             "category": {
                 "census_household_num": 10,
@@ -99,15 +99,18 @@
     },
     "dinks": {
         "cost": {
-            "rate": 30,
+            "rate": {
+                "commute": 30,
+                "remote": 40
+            },
             "category": {
                 "rent_market_price": 100
             }
         },
         "transport": {
             "rate": {
-                "commute": 35,
-                "remote": 20
+                "commute": 45,
+                "remote": 25
             },
             "category": {
                 "line": {
@@ -139,15 +142,15 @@
             }
         },
         "security": {
-            "rate": 10,
+            "rate": 5,
             "category": {
                 "crime_rate": 100
             }
         },
         "life_convenience": {
             "rate": {
-                "commute": 20,
-                "remote": 35
+                "commute": 15,
+                "remote": 25
             },
             "category": {
                 "shopping": {
@@ -182,7 +185,7 @@
                 }
             }
         },
-        "household_rate": {
+        "household": {
             "rate": 5,
             "category": {
                 "census_household_num": 10,
@@ -192,19 +195,22 @@
     },
     "single": {
         "cost": {
-            "rate": 40,
+            "rate": {
+                "commute": 45,
+                "remote": 45
+            },
             "category": {
                 "rent_market_price": 100
             }
         },
         "transport": {
             "rate": {
-                "commute": 40,
+                "commute": 45,
                 "remote": 25
             },
             "category": {
                 "line": {
-                    "rate": 15,
+                    "rate": 10,
                     "category": {
                         "line_num": 100
                     }
@@ -220,7 +226,7 @@
                     }
                 },
                 "transfer": {
-                    "rate": 25,
+                    "rate": 30,
                     "category": {
                         "transfer_tokyo": 25,
                         "transfer_shinagawa": 20,
@@ -231,16 +237,10 @@
                 }
             }
         },
-        "security": {
-            "rate": 5,
-            "category": {
-                "crime_rate": 100
-            }
-        },
         "life_convenience": {
             "rate": {
                 "commute": 10,
-                "remote": 25
+                "remote": 30
             },
             "category": {
                 "shopping": {
@@ -273,13 +273,6 @@
                         "restaurant_num": 100
                     }
                 }
-            }
-        },
-        "household_rate": {
-            "rate": 5,
-            "category": {
-                "census_household_num": 10,
-                "census_single_rate": 90
             }
         }
     }
