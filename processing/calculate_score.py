@@ -9,6 +9,7 @@ import shutil
 import datetime
 import numpy as np
 import pandas as pd
+from scipy.stats import rankdata
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -19,8 +20,7 @@ class CalculateScore:
     def load_data(self):
         self.df = pd.read_csv(self.data_path +
                               "station_area_info_1km.csv", index_col=0)
-        self.df.dropna(subset=["census_household_num",
-                               "crime_rate"], inplace=True)
+        self.df.dropna(subset=["crime_rate"], inplace=True)
         self.station_set = set(self.df.index)
         with open(self.data_path + "rent_market_price.json", "r") as f:
             self.rent_market_price = json.load(f)
@@ -57,50 +57,35 @@ class CalculateScore:
                     int(np.mean(total_price)), -3)
         return selected_rent_market_price
 
-    def create_score(self, df, weight_dict, household_type, station):
-        df_score = copy.deepcopy(df)
+    def create_score(self, df, weight_dict, commute_type, distination):
         total_score = 0
-        for lk, lv in weight_dict.items():
-            if household_type != None:
-                if lk in ["cost", "transport", "life_convenience"]:
-                    lr = lv["rate"][household_type]
+        all_cols = []
+        for key1, val1 in weight_dict.items():
+            key1_cols = []
+            if commute_type != None and key1 in ["cost", "transport"]:
+                val1 = val1[commute_type]
+            for key2, val2 in val1.items():
+                key2_cols = []
+                if type(val2) == dict:
+                    for key3, val3 in val2.items():
+                        df[f"{key3}_score"] = self.calculate_score(
+                            df, key3, val3)
+                        key2_cols.append(f"{key3}_score")
+                    df = self.sum_cols(df, key2, key2_cols)
+                    key1_cols.extend(key2_cols)
                 else:
-                    lr = lv["rate"]
-            else:
-                lr = lv["rate"]
-            all_cols = []
-            for mk, mv in lv["category"].items():
-                if type(mv) == dict:
-                    mr = mv["rate"]
-                    cols = []
-                    if station and (mk == "time" or mk == "transfer"):
-                        col = f"{mk}_{station}"
-                        rate = mv["category"][col]
-                        df_score.insert(0, f"{col}_score", self.calculate_score(
-                            df, col, rate/100))
-                        cols.append(f"{col}_score")
-                    else:
-                        for col, rate in mv["category"].items():
-                            df_score.insert(0, f"{col}_score", self.calculate_score(
-                                df, col, rate/100))
-                            cols.append(f"{col}_score")
-                    df_score.insert(
-                        0, f"{mk}_score", df_score[cols].sum(axis=1))
-                    df_score[cols] *= mr / 100
-                    all_cols.extend(cols)
-                else:
-                    df_score.insert(0, f"{mk}_score", self.calculate_score(
-                        df, mk, mv/100))
-                    all_cols.append(f"{mk}_score")
-
-            df_score.insert(0, f"{lk}_score", df_score[all_cols].sum(axis=1))
-            df_score[all_cols] *= lr
-            total_score += df_score[all_cols].sum(axis=1)
-        df_score.insert(0, "total_score", total_score)
-        df_score.sort_values("total_score", ascending=False, inplace=True)
-        df_score.insert(
-            0, "ranking", [i for i in range(1, df_score.shape[0]+1)])
-        return df_score
+                    if key2 in ["time", "transfer"]:
+                        key2 += f"_{distination}"
+                    df[f"{key2}_score"] = self.calculate_score(
+                        df, key2, val2)
+                    key1_cols.append(f"{key2}_score")
+            df = self.sum_cols(df, key1, key1_cols)
+            all_cols.extend(key1_cols)
+        df = self.sum_cols(df, "total", all_cols)
+        df.sort_values("total_score", ascending=False, inplace=True)
+        df.insert(0, "ranking", rankdata(df["total_score"]*-1, method="min"))
+        df["ranking"] = df["ranking"].astype(int)
+        return df
 
     def calculate_score(self, df, col, rate):
         score = copy.deepcopy(df[col].values)
@@ -108,13 +93,22 @@ class CalculateScore:
             score *= -1
         score = MinMaxScaler().fit_transform(score.reshape(-1, 1))
         score *= rate
+        score = np.round(score, 2)
         return score
 
-    def main(self, condition, weight_dict, household_type=None, station=None):
+    def sum_cols(self, df, key, cols):
+        if len(cols) == 1:
+            df.insert(0, f"{key}_score", df[cols])
+        else:
+            df.insert(0, f"{key}_score", round(
+                df[cols].sum(axis=1), 2))
+        return df
+
+    def main(self, condition, weight_dict, commute_type=None, distination=None):
         rent_market_price = self.search_rent_market_price(condition)
         df = copy.deepcopy(self.df.loc[rent_market_price.keys()])
         df["rent_market_price"] = rent_market_price.values()
-        return self.create_score(df, weight_dict, household_type, station)
+        return self.create_score(df, weight_dict, commute_type, distination)
 
 
 if __name__ == "__main__":

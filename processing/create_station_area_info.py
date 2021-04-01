@@ -7,6 +7,7 @@ import json
 import glob
 import pickle
 import argparse
+import numpy as np
 import pandas as pd
 from preprocess import select_by_mesh
 
@@ -48,10 +49,8 @@ class CreateStationAreaInfo:
             self.extracted_stations = pickle.load(f)
         self.df_crime_rate = pd.read_csv(self.data_path + "crime_rate.csv")
         df_census = pd.read_csv(self.data_path + "census.csv")
-        self.df_census = df_census[["lat", "lon", "一般世帯数_総数（世帯の家族類型）", "single_rate", "dinks_rate",
-                                    "0~5age_rate", "6~18age_rate"]]
-        self.df_census.columns = ["lat", "lon", "household_num", "single_rate", "dinks_rate",
-                                  "0~5age_rate", "6~18age_rate"]
+        self.df_census = df_census[[
+            "lat", "lon", "0~6age_rate", "6~18age_rate"]]
         self.df_city_park = pd.read_csv(self.data_path + "city_park.csv")
         with open("../data/hospital.pkl", "rb") as f:
             hospital_list = pickle.load(f)
@@ -120,6 +119,10 @@ class CreateStationAreaInfo:
                 print(f"{i}, elapsed_time:{elapsed_time}[sec]")
                 start = time.time()
         self.df_station_area_info = pd.DataFrame(self.station_dict).T
+        tmp = self.df_station_area_info["mun"]
+        self.df_station_area_info.drop(columns="mun", inplace=True)
+        self.df_station_area_info.insert(
+            self.df_station_area_info.columns.get_loc("post"), "mun", tmp)
 
     def add_crime_rate(self):
         for p in set(self.df_crime_rate["都道府県"]):
@@ -145,8 +148,8 @@ class CreateStationAreaInfo:
             self.station_dict[self.station][f"census_{k}"] = v
 
     def add_city_park(self, df):
-        self.station_dict[self.station][f"city_park_area"] = int(
-            df["供用済面積（m2）"].sum())
+        # self.station_dict[self.station][f"city_park_area"] = int(
+        #     df["供用済面積（m2）"].sum())
         for pt in self.park_type:
             self.station_dict[self.station][f"city_park_{pt}"] = df[df["type"]
                                                                     == pt].shape[0]
@@ -186,6 +189,8 @@ class CreateStationAreaInfo:
             self.station_dict[self.station]["restaurant_num"] = 0
 
     def add_transport(self):
+        time_list = []
+        transfer_list = []
         for tsk, tsv in self.terminal_station.items():
             df_tmp = pd.DataFrame(
                 self.extracted_stations[self.station_dict[tsk]["station_g_cd"]])
@@ -193,6 +198,13 @@ class CreateStationAreaInfo:
             self.station_dict[self.station][f"time_{tsv}"] = df_tmp[condition]["time_required"].values[0]
             self.station_dict[self.station][f"transfer_{tsv}"] = df_tmp[
                 condition]["number_of_transfers"].values[0]
+            time_list.append(df_tmp[condition]["time_required"].values[0])
+            transfer_list.append(df_tmp[
+                condition]["number_of_transfers"].values[0])
+        self.station_dict[self.station][f"time_average"] = np.mean(
+            time_list)
+        self.station_dict[self.station][f"transfer_average"] = np.mean(
+            transfer_list)
 
     def save_station_area_info(self):
         path = self.data_path + f"station_area_info_{self.dist_range}km.csv"

@@ -49,8 +49,7 @@ class CreateCensus:
             if i == 0:
                 columns.extend(df.iloc[columns_row, :columns_num[i]].values)
             else:
-                tmp = df.iloc[columns_row, columns_num[i-1]
-                    :columns_num[i]].values
+                tmp = df.iloc[columns_row, columns_num[i-1]                              :columns_num[i]].values
                 cotegory = remove_bracket(
                     df.iloc[category_row, columns_num[i-1]])
                 columns.extend([cotegory+"_"+t for t in tmp])
@@ -94,10 +93,10 @@ class CreateCensus:
         df = pd.merge(df, self.df_key_latlon, on='key_code', how='inner')
         df['single_rate'] = df['一般世帯数_単独世帯'] / df['一般世帯数_総数（世帯の家族類型）']
         df['dinks_rate'] = df['一般世帯人員_うち夫婦のみの世帯'] / df['一般世帯数_総数（世帯の家族類型）']
-        df['0~5age_rate'] = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
+        df['0~6age_rate'] = df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] / \
             df['一般世帯数_総数（世帯の家族類型）']
         df['6~18age_rate'] = (df['18歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）'] -
-                        df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）']) / df['一般世帯数_総数（世帯の家族類型）']
+                              df['６歳未満世帯員のいる一般世帯数_総数（世帯の家族類型）']) / df['一般世帯数_総数（世帯の家族類型）']
         return df
 
 

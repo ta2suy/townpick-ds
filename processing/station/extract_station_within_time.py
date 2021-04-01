@@ -12,7 +12,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from preprocess import list_to_df  # nopep8
 
 
-def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list) -> list:
+def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list, transfer_time=5) -> list:
+    accum_time += num_transfer * transfer_time
     df_line_tmp = df_train_schedule[df_train_schedule['line_code'] == line_code]
     line_station_id_set = set(df_line_tmp["line_station_info_id"])
     station1_timetable_id = set(

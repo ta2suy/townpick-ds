@@ -1,278 +1,123 @@
 {
     "family": {
         "cost": {
-            "rate": 30,
-            "category": {
-                "rent_market_price": 100
-            }
+            "rent_market_price": 30
         },
         "transport": {
-            "rate": 15,
-            "category": {
-                "line": {
-                    "rate": 15,
-                    "category": {
-                        "line_num": 100
-                    }
-                },
-                "time": {
-                    "rate": 60,
-                    "category": {
-                        "time_tokyo": 25,
-                        "time_shinagawa": 20,
-                        "time_shinjuku": 20,
-                        "time_shibuya": 20,
-                        "time_ikebukuro": 15
-                    }
-                },
-                "transfer": {
-                    "rate": 25,
-                    "category": {
-                        "transfer_tokyo": 25,
-                        "transfer_shinagawa": 20,
-                        "transfer_shinjuku": 20,
-                        "transfer_shibuya": 20,
-                        "transfer_ikebukuro": 15
-                    }
-                }
-            }
+            "line_num": 3,
+            "time_average": 14,
+            "transfer_average": 4
         },
         "security": {
-            "rate": 10,
-            "category": {
-                "crime_rate": 100
-            }
+            "crime_rate": 10
         },
         "life_convenience": {
-            "rate": 35,
-            "category": {
-                "shopping": {
-                    "rate": 30,
-                    "category": {
-                        "shopping_supermarket": 35,
-                        "shopping_shopping_mall": 35,
-                        "shopping_convenience_store": 10,
-                        "shopping_baby_goods_store": 20
-                    }
-                },
-                "medical": {
-                    "rate": 25,
-                    "category": {
-                        "med_hospital": 40,
-                        "med_clinic_all": 20,
-                        "med_clinic_pediatrics": 40
-                    }
-                },
-                "education": {
-                    "rate": 20,
-                    "category": {
-                        "education_nursery": 60,
-                        "school_primary": 30,
-                        "school_junior_high": 10
-                    }
-                },
-                "city_park": {
-                    "rate": 15,
-                    "category": {
-                        "city_park_area": 25,
-                        "city_park_small": 25,
-                        "city_park_middle": 25,
-                        "city_park_large": 25
-                    }
-                },
-                "restaurant": {
-                    "rate": 10,
-                    "category": {
-                        "restaurant_num": 100
-                    }
-                }
+            "shopping": {
+                "shopping_supermarket": 3,
+                "shopping_shopping_mall": 2,
+                "shopping_convenience_store": 1,
+                "shopping_baby_goods_store": 2
+            },
+            "medical": {
+                "med_hospital": 2,
+                "med_clinic_all": 1,
+                "med_clinic_pediatrics": 3
+            },
+            "education": {
+                "education_nursery": 3,
+                "school_primary": 2,
+                "school_junior_high": 1
+            },
+            "city_park": {
+                "city_park_small": 2,
+                "city_park_middle": 2,
+                "city_park_large": 2
+            },
+            "restaurant": {
+                "restaurant_num": 4
             }
         },
         "household": {
-            "rate": 10,
-            "category": {
-                "census_household_num": 10,
-                "census_0~5age_rate": 45,
-                "census_6~18age_rate": 45
-            }
+            "census_0~6age_rate": 5,
+            "census_6~18age_rate": 5
         }
     },
     "dinks": {
         "cost": {
-            "rate": {
-                "commute": 30,
-                "remote": 40
+            "commute": {
+                "rent_market_price": 30
             },
-            "category": {
-                "rent_market_price": 100
+            "remote": {
+                "rent_market_price": 50
             }
         },
         "transport": {
-            "rate": {
-                "commute": 45,
-                "remote": 25
+            "commute": {
+                "line_num": 5,
+                "time": 35,
+                "transfer": 10
             },
-            "category": {
-                "line": {
-                    "rate": 15,
-                    "category": {
-                        "line_num": 100
-                    }
-                },
-                "time": {
-                    "rate": 60,
-                    "category": {
-                        "time_tokyo": 25,
-                        "time_shinagawa": 20,
-                        "time_shinjuku": 20,
-                        "time_shibuya": 20,
-                        "time_ikebukuro": 15
-                    }
-                },
-                "transfer": {
-                    "rate": 25,
-                    "category": {
-                        "transfer_tokyo": 25,
-                        "transfer_shinagawa": 20,
-                        "transfer_shinjuku": 20,
-                        "transfer_shibuya": 20,
-                        "transfer_ikebukuro": 15
-                    }
-                }
+            "remote": {
+                "line_num": 3,
+                "time_average": 21,
+                "transfer_average": 6
             }
         },
         "security": {
-            "rate": 5,
-            "category": {
-                "crime_rate": 100
-            }
+            "crime_rate": 5
         },
         "life_convenience": {
-            "rate": {
-                "commute": 15,
-                "remote": 25
+            "shopping": {
+                "shopping_supermarket": 3,
+                "shopping_shopping_mall": 2,
+                "shopping_convenience_store": 1
             },
-            "category": {
-                "shopping": {
-                    "rate": 35,
-                    "category": {
-                        "shopping_supermarket": 40,
-                        "shopping_shopping_mall": 30,
-                        "shopping_convenience_store": 30
-                    }
-                },
-                "medical": {
-                    "rate": 25,
-                    "category": {
-                        "med_hospital": 30,
-                        "med_clinic_all": 70
-                    }
-                },
-                "city_park": {
-                    "rate": 10,
-                    "category": {
-                        "city_park_area": 25,
-                        "city_park_small": 25,
-                        "city_park_middle": 25,
-                        "city_park_large": 25
-                    }
-                },
-                "restaurant": {
-                    "rate": 30,
-                    "category": {
-                        "restaurant_num": 100
-                    }
-                }
-            }
-        },
-        "household": {
-            "rate": 5,
-            "category": {
-                "census_household_num": 10,
-                "census_dinks_rate": 90
+            "medical": {
+                "med_hospital": 1,
+                "med_clinic_all": 2
+            },
+            "city_park": {
+                "city_park_small": 1,
+                "city_park_middle": 1,
+                "city_park_large": 1
+            },
+            "restaurant": {
+                "restaurant_num": 3
             }
         }
     },
     "single": {
         "cost": {
-            "rate": {
-                "commute": 45,
-                "remote": 45
+            "commute": {
+                "rent_market_price": 40
             },
-            "category": {
-                "rent_market_price": 100
+            "remote": {
+                "rent_market_price": 60
             }
         },
         "transport": {
-            "rate": {
-                "commute": 45,
-                "remote": 25
+            "commute": {
+                "line_num": 5,
+                "time": 35,
+                "transfer": 10
             },
-            "category": {
-                "line": {
-                    "rate": 10,
-                    "category": {
-                        "line_num": 100
-                    }
-                },
-                "time": {
-                    "rate": 60,
-                    "category": {
-                        "time_tokyo": 25,
-                        "time_shinagawa": 20,
-                        "time_shinjuku": 20,
-                        "time_shibuya": 20,
-                        "time_ikebukuro": 15
-                    }
-                },
-                "transfer": {
-                    "rate": 30,
-                    "category": {
-                        "transfer_tokyo": 25,
-                        "transfer_shinagawa": 20,
-                        "transfer_shinjuku": 20,
-                        "transfer_shibuya": 20,
-                        "transfer_ikebukuro": 15
-                    }
-                }
+            "remote": {
+                "line_num": 3,
+                "time_average": 21,
+                "transfer_average": 6
             }
         },
         "life_convenience": {
-            "rate": {
-                "commute": 10,
-                "remote": 30
+            "shopping": {
+                "shopping_supermarket": 2,
+                "shopping_convenience_store": 2
             },
-            "category": {
-                "shopping": {
-                    "rate": 40,
-                    "category": {
-                        "shopping_supermarket": 30,
-                        "shopping_shopping_mall": 10,
-                        "shopping_convenience_store": 60
-                    }
-                },
-                "medical": {
-                    "rate": 25,
-                    "category": {
-                        "med_hospital": 20,
-                        "med_clinic_all": 80
-                    }
-                },
-                "city_park": {
-                    "rate": 5,
-                    "category": {
-                        "city_park_area": 25,
-                        "city_park_small": 25,
-                        "city_park_middle": 25,
-                        "city_park_large": 25
-                    }
-                },
-                "restaurant": {
-                    "rate": 30,
-                    "category": {
-                        "restaurant_num": 100
-                    }
-                }
+            "medical": {
+                "med_hospital": 1,
+                "med_clinic_all": 2
+            },
+            "restaurant": {
+                "restaurant_num": 3
             }
         }
     }
