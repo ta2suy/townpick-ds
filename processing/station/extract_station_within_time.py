@@ -12,6 +12,17 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from preprocess import list_to_df  # nopep8
 
 
+def load_data():
+    # Load data
+    df_train_schedule = pd.read_csv(
+        '/home/vagrant/share/data/train_schedule/train_schedule_fix.csv')
+
+    with open('/home/vagrant/project/town-pick/town-pick/data/station_g_cd_dict.pkl', 'rb') as f:
+        station_g_code_dict = pickle.load(f)
+
+    return df_train_schedule, station_g_code_dict
+
+
 def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int, station_code: int, accum_time: int, max_time: int, num_transfer: int, extracted_station_list: list, transfer_time=5) -> list:
     accum_time += num_transfer * transfer_time
     df_line_tmp = df_train_schedule[df_train_schedule['line_code'] == line_code]
@@ -30,36 +41,58 @@ def extract_stations_within_time(df_train_schedule: pd.DataFrame, line_code: int
 
             index = df_timetable_tmp[df_timetable_tmp['station1_g_cd']
                                      == station_code].index
-            if len(index) != 0:
-                tmp_time = accum_time
-                for i in range(index[0], df_timetable_tmp.shape[0]):
-                    tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
-                    if tmp_time > max_time:
-                        break
-                    extracted_station_list.append({
-                        'station_g_cd': df_timetable_tmp.loc[i, 'station2_g_cd'],
-                        'time_required': tmp_time,
-                        'number_of_transfers': num_transfer,
-                        'line_used': df_timetable_tmp.loc[i, 'line_name'],
-                        'transfer_station': station_code,
-                    })
+            if len(index) > 0:
+                for id in index:
+                    tmp_time = accum_time
+                    for i in range(id, df_timetable_tmp.shape[0]):
+                        tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                        if tmp_time > max_time:
+                            break
+                        extracted_station_list.append({
+                            'station_g_cd': df_timetable_tmp.loc[i, 'station2_g_cd'],
+                            'time_required': tmp_time,
+                            'number_of_transfers': num_transfer,
+                            'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                            'transfer_station': int(station_code),
+                        })
 
             index = df_timetable_tmp[df_timetable_tmp['station2_g_cd']
                                      == station_code].index
-            if len(index) != 0:
-                tmp_time = accum_time
-                for i in reversed(range(0, index[0]+1)):
-                    tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
-                    if tmp_time > max_time:
-                        break
-                    extracted_station_list.append({
-                        'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
-                        'time_required': tmp_time,
-                        'number_of_transfers': num_transfer,
-                        'line_used': df_timetable_tmp.loc[i, 'line_name'],
-                        'transfer_station': station_code,
-                    })
+            if len(index) > 0:
+                for id in index:
+                    tmp_time = accum_time
+                    for i in reversed(range(0, id+1)):
+                        tmp_time += df_timetable_tmp.loc[i, 'estimated_time']
+                        if tmp_time > max_time:
+                            break
+                        extracted_station_list.append({
+                            'station_g_cd': df_timetable_tmp.loc[i, 'station1_g_cd'],
+                            'time_required': tmp_time,
+                            'number_of_transfers': num_transfer,
+                            'line_used': df_timetable_tmp.loc[i, 'line_name'],
+                            'transfer_station': int(station_code),
+                        })
 
+    return extracted_station_list
+
+
+def create_extracted_station(df, station_code, accum_time, max_time, num_transfer, extracted_station_list, gcd_type):
+    index = df[df[gcd_type] == station_code].index
+    gcd_list = ["station1_g_cd", "station2_g_cd"]
+    if len(index) > 0:
+        for id in index:
+            tmp_time = accum_time
+            for i in range(id, df.shape[0]):
+                tmp_time += df.loc[i, 'estimated_time']
+                if tmp_time > max_time:
+                    break
+                extracted_station_list.append({
+                    'station_g_cd': df.loc[i, [t for t in gcd_list if gcd_type != t][0]],
+                    'time_required': tmp_time,
+                    'number_of_transfers': num_transfer,
+                    'line_used': df.loc[i, 'line_name'],
+                    'transfer_station': station_code,
+                })
     return extracted_station_list
 
 
@@ -75,16 +108,11 @@ if __name__ == '__main__':
     max_transfer = args.max_transfer
 
     # Load data
-    train_schedule_path = '/home/vagrant/share/data/train_schedule/'
-    df_train_schedule = pd.read_csv(
-        train_schedule_path + 'train_schedule_fix.csv')
+    df_train_schedule, station_g_code_dict = load_data()
 
     # Remove limited express line
     df_train_schedule = df_train_schedule[df_train_schedule['additional_fee'] == 0].reset_index(
         drop=True)
-
-    with open('../../data/station_g_cd_dict.pkl', 'rb') as f:
-        station_g_code_dict = pickle.load(f)
 
     # Extract stations within time required
     extracted_station = {}

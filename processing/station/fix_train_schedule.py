@@ -135,5 +135,12 @@ if __name__ == '__main__':
         df_train_schedule = pd.concat(
             [df_train_schedule, df_station_g_cd], axis=1)
 
+    # Add JR山手線 info
+    df_tmp = df_train_schedule[df_train_schedule["line_name"] == "JR山手線"]
+    i = de_tmp.index[-1]+1
+    df_train_schedule = pd.concat(
+        [df_train_schedule.iloc[:i, :], df_tmp, df_train_schedule.iloc[i:, :]])
+    df_train_schedule.reset_index(drop=True, inplace=True)
+
     # Save train schedule
     df_train_schedule.to_csv(train_schedule_fix_path, index=False)

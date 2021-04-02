@@ -59,7 +59,8 @@
                 "20<x<=30Y"
             ],
             "minutes_walk": [
-                "x<=5min"
+                "x<=5min",
+                "5<x<=10min"
             ],
             "floor_plan": [
                 "1LDK~2DK"
@@ -80,7 +81,8 @@
             ],
             "minutes_walk": [
                 "x<=5min",
-                "5<x<=10min"
+                "5<x<=10min",
+                "10<x<=15min"
             ],
             "floor_plan": [
                 "2LDK~3DK"
@@ -102,7 +104,8 @@
                 "20<x<=30Y"
             ],
             "minutes_walk": [
-                "x<=5min"
+                "x<=5min",
+                "5<x<=10min"
             ],
             "floor_plan": [
                 "1R~1DK"
@@ -123,7 +126,8 @@
             ],
             "minutes_walk": [
                 "x<=5min",
-                "5<x<=10min"
+                "5<x<=10min",
+                "10<x<=15min"
             ],
             "floor_plan": [
                 "1R~1DK"

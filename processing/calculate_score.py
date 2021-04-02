@@ -93,7 +93,7 @@ class CalculateScore:
             score *= -1
         score = MinMaxScaler().fit_transform(score.reshape(-1, 1))
         score *= rate
-        score = np.round(score, 2)
+        score = np.round(score, 1)
         return score
 
     def sum_cols(self, df, key, cols):
@@ -101,7 +101,7 @@ class CalculateScore:
             df.insert(0, f"{key}_score", df[cols])
         else:
             df.insert(0, f"{key}_score", round(
-                df[cols].sum(axis=1), 2))
+                df[cols].sum(axis=1), 1))
         return df
 
     def main(self, condition, weight_dict, commute_type=None, distination=None):
