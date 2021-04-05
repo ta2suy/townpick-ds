@@ -1,12 +1,24 @@
 {
     "family": {
         "cost": {
-            "rent_market_price": 30
+            "commute": {
+                "rent_market_price": 30
+            },
+            "remote": {
+                "rent_market_price": 30
+            }
         },
         "transport": {
-            "line_num": 3,
-            "time_average": 14,
-            "transfer_average": 4
+            "commute": {
+                "line_num": 2,
+                "time": 14,
+                "transfer": 4
+            },
+            "remote": {
+                "line_num": 2,
+                "time_average": 14,
+                "transfer_average": 4
+            }
         },
         "security": {
             "crime_rate": 10
@@ -68,9 +80,9 @@
         },
         "life_convenience": {
             "shopping": {
-                "shopping_supermarket": 3,
+                "shopping_supermarket": 2,
                 "shopping_shopping_mall": 2,
-                "shopping_convenience_store": 1
+                "shopping_convenience_store": 2
             },
             "medical": {
                 "med_hospital": 1,
@@ -89,10 +101,10 @@
     "single": {
         "cost": {
             "commute": {
-                "rent_market_price": 40
+                "rent_market_price": 30
             },
             "remote": {
-                "rent_market_price": 60
+                "rent_market_price": 40
             }
         },
         "transport": {
@@ -102,23 +114,32 @@
                 "transfer": 10
             },
             "remote": {
-                "line_num": 3,
-                "time_average": 21,
-                "transfer_average": 6
+                "line_num": 4,
+                "time_average": 28,
+                "transfer_average": 8
             }
         },
         "life_convenience": {
             "shopping": {
                 "shopping_supermarket": 2,
+                "shopping_shopping_mall": 2,
                 "shopping_convenience_store": 2
             },
             "medical": {
                 "med_hospital": 1,
                 "med_clinic_all": 2
             },
+            "city_park": {
+                "city_park_small": 1,
+                "city_park_middle": 1,
+                "city_park_large": 1
+            },
             "restaurant": {
                 "restaurant_num": 3
             }
+        },
+        "security": {
+            "crime_rate": 5
         }
     }
 }

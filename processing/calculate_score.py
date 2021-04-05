@@ -121,20 +121,29 @@ if __name__ == "__main__":
         datetime.datetime.now().strftime('%Y.%m.%d_%H.%M.%S') + "/"
     os.mkdir(result_path)
     for wdk, wdv in weight_dict.items():
-        for k, v in conditions[wdk].items():
-            print(wdk, k)
-            if wdk == "family":
-                df_score = cs.main(v, wdv)
-            else:
-                if k == "commute":
-                    for station in station_list:
-                        df_score = cs.main(v, wdv, k, station)
+        for ck, cv in conditions[wdk].items():
+            print(wdk, ck)
+            if ck == "commute":
+                for station in station_list:
+                    if wdk == "family":
+                        for k, v in cv.items():
+                            df_score = cs.main(v, wdv, ck, station)
+                            df_score.to_csv(
+                                result_path + f"{wdk}_{k}_{ck}_{station}_score.csv")
+                    else:
+                        df_score = cs.main(cv, wdv, ck, station)
                         df_score.to_csv(
-                            result_path + f"{wdk}_{k}_{station}_score.csv")
-                    continue
+                            result_path + f"{wdk}_{ck}_{station}_score.csv")
+                continue
+            else:
+                if wdk == "family":
+                    for k, v in cv.items():
+                        df_score = cs.main(v, wdv, ck)
+                        df_score.to_csv(
+                            result_path + f"{wdk}_{k}_{ck}_score.csv")
                 else:
-                    df_score = cs.main(v, wdv, k)
-            df_score.to_csv(result_path + f"{wdk}_{k}_score.csv")
+                    df_score = cs.main(cv, wdv, ck)
+                    df_score.to_csv(result_path + f"{wdk}_{ck}_score.csv")
     files = ["property_conditions.json", "weight_dict.json"]
     for f in files:
         shutil.copyfile(cs.data_path + f, result_path + f)

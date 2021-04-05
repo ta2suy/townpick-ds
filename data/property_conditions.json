@@ -1,50 +1,98 @@
 {
     "family": {
-        "three_members": {
-            "property_type": [
-                "condominium"
-            ],
-            "year": [
-                "new",
-                "x<=10Y",
-                "10<x<=20Y",
-                "20<x<=30Y"
-            ],
-            "minutes_walk": [
-                "x<=5min",
-                "5<x<=10min",
-                "10<x<=15min"
-            ],
-            "floor_plan": [
-                "2LDK~3DK"
-            ],
-            "floor_area": [
-                "60<x<=70㎡",
-                "70<x<=80㎡"
-            ]
+        "commute": {
+            "three_members": {
+                "property_type": [
+                    "condominium"
+                ],
+                "year": [
+                    "new",
+                    "x<=10Y",
+                    "10<x<=20Y",
+                    "20<x<=30Y"
+                ],
+                "minutes_walk": [
+                    "x<=5min",
+                    "5<x<=10min"
+                ],
+                "floor_plan": [
+                    "2LDK~3DK"
+                ],
+                "floor_area": [
+                    "60<x<=70㎡",
+                    "70<x<=80㎡"
+                ]
+            },
+            "four_members": {
+                "property_type": [
+                    "condominium"
+                ],
+                "year": [
+                    "new",
+                    "x<=10Y",
+                    "10<x<=20Y",
+                    "20<x<=30Y"
+                ],
+                "minutes_walk": [
+                    "x<=5min",
+                    "5<x<=10min"
+                ],
+                "floor_plan": [
+                    "3LDK~4DK"
+                ],
+                "floor_area": [
+                    "70<x<=80㎡",
+                    "80<x<=90㎡"
+                ]
+            }
         },
-        "four_members": {
-            "property_type": [
-                "condominium"
-            ],
-            "year": [
-                "new",
-                "x<=10Y",
-                "10<x<=20Y",
-                "20<x<=30Y"
-            ],
-            "minutes_walk": [
-                "x<=5min",
-                "5<x<=10min",
-                "10<x<=15min"
-            ],
-            "floor_plan": [
-                "3LDK~4DK"
-            ],
-            "floor_area": [
-                "70<x<=80㎡",
-                "80<x<=90㎡"
-            ]
+        "remote": {
+            "three_members": {
+                "property_type": [
+                    "condominium"
+                ],
+                "year": [
+                    "new",
+                    "x<=10Y",
+                    "10<x<=20Y",
+                    "20<x<=30Y"
+                ],
+                "minutes_walk": [
+                    "x<=5min",
+                    "5<x<=10min",
+                    "10<x<=15min"
+                ],
+                "floor_plan": [
+                    "2LDK~3DK"
+                ],
+                "floor_area": [
+                    "60<x<=70㎡",
+                    "70<x<=80㎡"
+                ]
+            },
+            "four_members": {
+                "property_type": [
+                    "condominium"
+                ],
+                "year": [
+                    "new",
+                    "x<=10Y",
+                    "10<x<=20Y",
+                    "20<x<=30Y"
+                ],
+                "minutes_walk": [
+                    "x<=5min",
+                    "5<x<=10min",
+                    "10<x<=15min"
+                ],
+                "floor_plan": [
+                    "3LDK~4DK"
+                ],
+                "floor_area": [
+                    "70<x<=80㎡",
+                    "80<x<=90㎡"
+                ]
+            }
         }
     },
     "dinks": {
